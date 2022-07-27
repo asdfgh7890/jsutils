@@ -444,6 +444,7 @@ Gfunc.$map = function(iterable, fn){
 	};
 	return array;
 };
+
 Gfunc.$truthyCount = function(iterable, fn){
 	fn ??= identical;
 	let tcount = 0;
@@ -528,9 +529,103 @@ Gfunc.$toSet = function(iterable){
 Gfunc.$toMap = function(iterable){
 	return new Map(iterable);
 };
+Gfunc.$toKeyedMap = function(iterable, keyIterable){
+	let tuple = [];
+	for(let e of iterable){
+		tuple.push([0, e]);
+	}
+	let i = 0;
+	for(let e of keyIterable){
+		if(i >= tuple.length) throw new SizeMismatchError('값과 키의 크기가 맞지 않음!'); 
+		tuple[i++][0] = e;
+	}
+	if(i != tuple.length) throw new SizeMismatchError('값과 키의 크기가 맞지 않음!'); 
+	return new Map(tuple);
+};
 Gfunc.$toEnumerateMap = function(iterable){
 	return new Map(iterable.$enumerate());
 };
+
+
+// 관련 통계 함수... null, undefined, NA, Error는 집계에서 제외하며 NaN을 만날 시 즉시 NaN 리턴
+Gfunc.$N = function(iterable){
+	let count = 0;
+	for(let e of iterable){
+		if(e === undefined || e === null || e.isNA()) continue;
+		count++;
+	};
+	return count;
+};
+
+Gfunc.$sum = function(iterable){
+	let count = 0, s;
+	for(let e of iterable){
+		if(count == 0) s = e;
+		else s = s.aug(e);
+		if(e === undefined || e === null || e.isNA()) continue;
+		if(Number.isNaN(e)) return NaN;
+		count++;
+	};
+	return count ? s : 0;
+};
+
+Gfunc.$mean = function(iterable){
+	let count = 0, s;
+	for(let e of iterable){
+		if(count == 0) s = e;
+		else s = s.aug(e);
+		if(e === undefined || e === null || e.isNA()) continue;
+		if(Number.isNaN(e)) return NaN;
+		count++;
+	};
+	return count ? s.div(count) : NA;
+};
+
+Gfunc.$max = function(iterable){
+	let count = 0, s;
+	for(let e of iterable){
+		if(count == 0) s = e;
+		else s = s.greatest(e);
+		if(e === undefined || e === null || e.isNA()) continue;
+		if(Number.isNaN(e)) return NaN;
+		count++;
+	};
+	return count ? s : NA;
+};
+
+Gfunc.$min = function(iterable){
+	let count = 0, s;
+	for(let e of iterable){
+		if(count == 0) s = e;
+		else s = s.least(e);
+		if(e === undefined || e === null || e.isNA()) continue;
+		if(Number.isNaN(e)) return NaN;
+		count++;
+	};
+	return count ? s : NA;
+};
+
+Gfunc.$var = function(iterable){
+	//return dna.reduce((a,b)=>a.add(b.sqSub(s)),0).div(this.N());
+	
+	let mean = Gfunc.$mean(iterable);
+	
+	let count = 0, s;
+	for(let e of iterable){
+		if(count == 0) s = e.sqSub(mean);
+		else s = s.aug(e.sqSub(mean));
+		if(e === undefined || e === null || e.isNA()) continue;
+		if(Number.isNaN(e)) return NaN;
+		count++;
+	};
+	return count ? s.div(count) : NA;
+};
+
+Gfunc.$stdev = function(iterable){
+	return Gfunc.$var(iterable).sqrt();
+};
+
+
 
 
 
@@ -5260,128 +5355,8 @@ Float32Array.RAW_EPSILON = 2**-23;
 Float64Array.RAW_EPSILON = Number.EPSILON;
 
 
-class TAPIndexing{
-	constructor(){
-		return this.proxy = new Proxy(this, {
-			get: (object, key) => {
-				if(typeof key !== 'symbol' && !Number.isNaN(Number(key))){
-					return object.at(key);
-				}
-				if(Reflect.has(object, key))
-					return Reflect.get(object, key);
-				return Reflect.get(object.target, key);
-			},
-			set: (object, key, value) => {
-				if(typeof key !== 'symbol' && !Number.isNaN(Number(key))){
-					object.setAt(key, value);
-					return true;
-				}
-				Reflect.set(object, key, value);
-				return true;
-			},
-			has: (object, key) => {
-				if(typeof key !== 'symbol' && !Number.isNaN(Number(key))){
-					return true;
-				}
-				if(Reflect.has(object, key))
-					return Reflect.has(object.target, key);
-				return Reflect.has(object, key);
-			},
-		});
-	}
-};
 
-
-class TypedArrayPointer extends TAPIndexing{
-	constructor(target, start, end, reversed){
-		super();
-		
-		this.target = target;
-		this.start = (start ?? 0);
-		this.end = (end ?? this.target.length);
-		this.reversed = reversed ?? false;
-		
-		if(this.start == 0 && 1/this.start < 0) this.start = target.length; // -0
-		else if(this.start < 0) this.start += target.length;
-		
-		if(this.end == 0 && 1/this.end < 0) this.end = target.length; // -0
-		else if(this.end < 0) this.end += target.length;
-		
-		this.start = this.start.fitInRange(0, this.target.length, '[)');
-		this.end = this.end.fitInRange(0, this.target.length, '[)');
-		
-		
-	};
-	get value(){
-		return this.target.slice(this.start, this.end);
-	};
-	set value(v){
-		if(v.isArray()){
-			if(this.end - this.start != v.length)
-				throw new RangeError('배열 개수 불일치 (단, 배열이 아닌 원소의 경우는 채워넣기 진행)');
-			this.target.set(v.num === undefined ? v : v.toFloat64Array(), this.start);
-		}else
-			this.target.fill(v, this.start, this.end);
-	};
-	valueOf(){
-		return this.target.slice(this.start, this.end).optional(this.reversed, 'reverse');
-	};
-	toString(){
-		return this.target.slice(this.start, this.end).optional(this.reversed, 'reverse').toString();
-	};
-	toStringEx(){
-		return '*'+this.target.slice(this.start, this.end).optional(this.reversed, 'reverse').toStringEx();
-	};
-	// 불필요한 서브어레이 생성 없이 연산함
-	// 모든 메소드 위장하기
-	
-	get length(){
-		return Math.max(0,this.end - this.start);
-	};
-	
-	_realIndex(idx){ // 포인터 상의 인덱스를 참조하는 배열 또는 포인터의 인덱스로 변환
-		let len = this.length;
-		if(idx < 0) idx += len;
-		if(this.reversed) idx = len - 1 - idx; // 반전된 경우
-		if(!idx.inRange(0, len, '[)')) throw new ArrayBoundaryError('범위 초과 | '+(idx));
-		return idx + this.start;
-	};
-	at(idx){
-		return this.target.at(this._realIndex(Number(idx)));
-	};
-	setAt(idx,val){
-		return this.target.setAt(this._realIndex(Number(idx)), val);
-	};
-	
-	get val(){
-		return new Proxy(this, {
-			get: function(pointer, i){
-				return pointer.at(+i);
-			},
-			set: function(pointer, i, v){		
-				pointer.target[pointer._realIndex(+i)] = v;
-				return true;
-			},
-		});
-	};
-	
-	[Symbol.iterator](){ // for of 문, ...문 사용 시에도 변조가 필요함
-		let that = this;
-		let i = -1;
-		return{
-			next: () => ({value: ++i < that.length ? that.at(i) : 0, done:!(i<that.length)})
-		};
-	};
-	// reverseCopy는 저기(target)서 도와줌
-	// 위장을 하기 위해 실제 배열로 위장
-	isArray(){
-		return true;
-	};
-	isGeneralArray(){
-		return true;
-	};
-};
-
+// TypedArrayPointer 필요 없이 subarray를 이용하면 된다!
 
 /*
 class TypedArrayPointer extends TAPIndexing{
@@ -5574,6 +5549,7 @@ for(let Type of TypedArrays){
 	
 	Type.prototype.binary = function(op, other){
 		if(other === undefined){
+			// compare 등의 특례 규정
 			return this.length ? this.reduce((a,b)=>Object.operations[op](a,b)) : Number.identities[op];
 		}
 		
@@ -5718,27 +5694,28 @@ for(let Type of TypedArrays){
 	
 	// TypedArray의 경우는 덮어쓰기 방식을 사용함
 	// 끝의 값을 정해야 하며 틀리면 RangeError 발생
+	// subarray의 목적이 복제가 아닌 부분 참조이므로 굳이 ArrayPointer 를 할 필요가 없음
+	// 다만, reversed 포인터 이용 불가능 (추후 지원될지도?)
 	
-	
-	Type.prototype.mid = function(a,b,reversed){
-		return new TypedArrayPointer(this, a, b, reversed);
-	};
+	Type.prototype.mid = Type.prototype.subarray;
 
 	Type.prototype.left = function(a, reversed){
-		return new TypedArrayPointer(this, 0, a, reversed);
+		return this.subarray(0,a);
 	};
 
 	Type.prototype.right = function(a, reversed){
-		return new TypedArrayPointer(this, this.length-a, this.length, reversed)
+		return this.subarray(a ? -a : Infinity);
 	};
 
 	Type.prototype.__defineGetter__('all', function(){
-		return new TypedArrayPointer(this, 0, this.length, false);
+		return this.subarray();
 	});
 
+	/*
 	Type.prototype.__defineGetter__('rev', function(){
-		return new TypedArrayPointer(this, 0, this.length, true);
+		return this; new TypedArrayPointer(this, 0, this.length, true);
 	});
+	*/
 
 
 	
@@ -5794,23 +5771,27 @@ for(let Type of TypedArrays){
 		Type.prototype[op] = Array.prototype[op];
 	}
 	
+	Type.prototype.pick = function(indices){
+		let that = this;
+		if(indices.isArray()){
+			return indices.map(x=>that.at(x));
+		}
+		return that.at(indices);
+	};
+	
 };
 
 // 8비트 배열에서는 256개이므로 사용 가능한 모든 숫자 표시, num, den, bias를 줄 수도 있음
 
-Uint8Array.availableValues = function(num,den,bias){
+Uint8Array.availableValues = function(){
 	let array = new Uint8Array(256);
 	array.forEach((x,i,A)=>A[i] = i);
-	if(num !== undefined)
-		array.setScale(num,den??1,bias??0);
 	return array;
 };
 
-Int8Array.availableValues = function(num,den,bias){
+Int8Array.availableValues = function(num,den,bias){ // Scaled8Array 겸용
 	let array = new Int8Array(256);
 	array.forEach((x,i,A)=>A[i] = i-128);
-	if(num !== undefined)
-		array.setScale(num,den??1,bias??0);
 	return array;
 };
 
@@ -5850,13 +5831,15 @@ Scaled8/16/32Array
 - 해당 값을 읽을 시 환산, 쓸 경우엔 역환산 적용 후 반올림 적용
 - 호환을 위해 Array, TypedArray 모두 해당 연산 사용 가능
 
-- 스케일 미 지정시 기본값
-- Scaled8Array     : 1/10
-- Scaled16Array    : 1/100
-- Scaled24Array    : 1/1000
-- Scaled32Array    : 1/10000
-- BigScaled64Array : 1/100000000n
+- 스케일 미 지정시 기본값 및 표현 가능 범위
+- Scaled8Array     : 1/10         : -12.8 ~ 12.7
+- Scaled16Array    : 1/100        : -327.68 ~ 327.67
+- Scaled24Array    : 1/1000       : -8388.608 ~ 8388.607
+- Scaled32Array    : 1/10000      : -214748.3648 ~ 214748.3647
+- BigScaled64Array : BIN(0n,1e-8) : BIN(-92233720369n, 0.45224192) ~ BIN(92233720369n, -0.45224193)
 
+* Int24Array, Uint24Array, Scaled24Array와 BigScaled64Array는 추후 예정
+* BIN 타입 : (정수부(BigInt), [-0.5, 0.5) 사이 실수부(Number)로 구성됨)
 
 */
 
@@ -5864,7 +5847,16 @@ Scaled8/16/32Array
 
 class _Scaled8Array extends Int8Array{
 	static DEFAULT_DEN = 10;
-	constructor(scaleInfo, array_or_size){
+	constructor(scaleInfo, array_or_size, third, fourth){
+		if(scaleInfo instanceof ArrayBuffer){
+			super(scaleInfo, array_or_size, third); // ArrayBuffer가 오면 다른 의미로 해석됨.
+			this.matchToScaleInfo({}); // Default
+			return;
+		}else if(array_or_size instanceof ArrayBuffer){ // 그 앞에 scaleInfo가, 그 바로 뒤 ArrayBuffer가 오는 경우
+			super(array_or_size, third, fourth);
+			this.matchToScaleInfo(scaleInfo);
+			return;
+		}
 		if(array_or_size === undefined){
 			if((scaleInfo.num ?? scaleInfo.den ?? scaleInfo.bias) === undefined)
 				array_or_size = scaleInfo, scaleInfo = {};
@@ -5872,7 +5864,7 @@ class _Scaled8Array extends Int8Array{
 		}
 		let num, den;
 		if(scaleInfo.num === undefined && scaleInfo.den === undefined){
-			num = 1; den = 10;
+			num = 1; den = Scaled8Array.DEFAULT_DEN;
 		}else{
 			num = scaleInfo.num ?? 1;
 			den = scaleInfo.den ?? 1;
@@ -5904,7 +5896,7 @@ class _Scaled8Array extends Int8Array{
 	};
 	matchToScaleInfo(other){
 		this.num = other.num ?? 1;
-		this.den = other.den ?? 1;
+		this.den = other.den ?? Scaled8Array.DEFAULT_DEN;
 		this.bias = other.bias ?? 0;
 		return this.proxy ?? this;
 	};
@@ -5916,7 +5908,7 @@ class _Scaled8Array extends Int8Array{
 		}
 		let num, den;
 		if(scaleInfo.num === undefined && scaleInfo.den === undefined){
-			num = 1; den = 10;
+			num = 1; den = Scaled8Array.DEFAULT_DEN;
 		}else{
 			num = scaleInfo.num ?? 1;
 			den = scaleInfo.den ?? 1;
@@ -5958,7 +5950,7 @@ class _Scaled8Array extends Int8Array{
 	
 	
 	map(fn){ // 매핑 연산은 무조건 64비트 실수 형으로 반환
-		return this.toFloat64Array().map(fn);
+		return this.toFloat64Array().map(fn); // Float64 형이므로 별도의 wrap 필요 없음
 	};
 	reduce(fn, init){
 		if(init === undefined)
@@ -5974,10 +5966,10 @@ class _Scaled8Array extends Int8Array{
 		return super.forEach((a,i,A) => fn(a.mda(this.num,this.den,this.bias),i,A));
 	};
 	slice(...args){
-		return super.slice(...args).matchToScaleInfo(this);
+		return Scaled8Array.wrapProxy(super.slice(...args).matchToScaleInfo(this));
 	};
 	subarray(...args){
-		return super.subarray(...args).matchToScaleInfo(this);
+		return Scaled8Array.wrapProxy(super.subarray(...args).matchToScaleInfo(this));
 	};
 	fill(...args){
 		args[0] = args[0].unmdar(this.num, this.den, this.bias);
@@ -6023,8 +6015,26 @@ class _Scaled8Array extends Int8Array{
 			next: () => ({value:that.at(++i), done:!(i<that.length)})
 		};
 	};
-};
+	
+	
+	mid(a,b){
+		return this.subarray(a,b);
+	};
 
+	left(a){
+		return this.subarray(0,a);
+	};
+
+	right(a){
+		return this.subarray(a ? -a : Infinity);
+	};
+
+	get all(){
+		return this.subarray();
+	};
+
+
+};
 
 class Scaled8Array{ // 첨자 기능 포함
 	static DEFAULT_DEN = 10;
@@ -6060,13 +6070,35 @@ class Scaled8Array{ // 첨자 기능 포함
 	static fromHexSequenceBE(...args){
 		return this.proxy = new Proxy(_Scaled8Array.fromHexSequenceBE(...args), Scaled8Array.handler);
 	};
+	static wrapProxy(object){
+		return this.proxy = new Proxy(object, Scaled8Array.handler);
+	};
+	
+	///////////////////////////////
+	// ★ Scaled8Array 전용임 ★ //
+	///////////////////////////////
+	static availableValues(scaleInfo){
+		let ab = new ArrayBuffer(256);
+		let i8 = new Int8Array(ab); 
+		i8.forEach((x,i,A)=>A[i] = i-128);
+		return new Scaled8Array(scaleInfo ?? {}, ab);
+	};
+
+	
 };
-
-
 
 class _Scaled16Array extends Int16Array{
 	static DEFAULT_DEN = 100;
-	constructor(scaleInfo, array_or_size){
+	constructor(scaleInfo, array_or_size, third, fourth){
+		if(scaleInfo instanceof ArrayBuffer){
+			super(scaleInfo, array_or_size, third); // ArrayBuffer가 오면 다른 의미로 해석됨.
+			this.matchToScaleInfo({}); // Default
+			return;
+		}else if(array_or_size instanceof ArrayBuffer){ // 그 앞에 scaleInfo가, 그 바로 뒤 ArrayBuffer가 오는 경우
+			super(array_or_size, third, fourth);
+			this.matchToScaleInfo(scaleInfo);
+			return;
+		}
 		if(array_or_size === undefined){
 			if((scaleInfo.num ?? scaleInfo.den ?? scaleInfo.bias) === undefined)
 				array_or_size = scaleInfo, scaleInfo = {};
@@ -6074,7 +6106,7 @@ class _Scaled16Array extends Int16Array{
 		}
 		let num, den;
 		if(scaleInfo.num === undefined && scaleInfo.den === undefined){
-			num = 1; den = 100;
+			num = 1; den = Scaled16Array.DEFAULT_DEN;
 		}else{
 			num = scaleInfo.num ?? 1;
 			den = scaleInfo.den ?? 1;
@@ -6106,9 +6138,9 @@ class _Scaled16Array extends Int16Array{
 	};
 	matchToScaleInfo(other){
 		this.num = other.num ?? 1;
-		this.den = other.den ?? 1;
+		this.den = other.den ?? Scaled16Array.DEFAULT_DEN;
 		this.bias = other.bias ?? 0;
-		return this;
+		return this.proxy ?? this;
 	};
 	static from(scaleInfo, iterable){
 		if(iterable === undefined){
@@ -6118,7 +6150,7 @@ class _Scaled16Array extends Int16Array{
 		}
 		let num, den;
 		if(scaleInfo.num === undefined && scaleInfo.den === undefined){
-			num = 1; den = 100;
+			num = 1; den = Scaled16Array.DEFAULT_DEN;
 		}else{
 			num = scaleInfo.num ?? 1;
 			den = scaleInfo.den ?? 1;
@@ -6158,8 +6190,9 @@ class _Scaled16Array extends Int16Array{
 		return super[idx] = value;
 	};
 	
+	
 	map(fn){ // 매핑 연산은 무조건 64비트 실수 형으로 반환
-		return this.toFloat64Array().map(fn);
+		return this.toFloat64Array().map(fn); // Float64 형이므로 별도의 wrap 필요 없음
 	};
 	reduce(fn, init){
 		if(init === undefined)
@@ -6175,10 +6208,10 @@ class _Scaled16Array extends Int16Array{
 		return super.forEach((a,i,A) => fn(a.mda(this.num,this.den,this.bias),i,A));
 	};
 	slice(...args){
-		return super.slice(...args).matchToScaleInfo(this);
+		return Scaled16Array.wrapProxy(super.slice(...args).matchToScaleInfo(this));
 	};
 	subarray(...args){
-		return super.subarray(...args).matchToScaleInfo(this);
+		return Scaled16Array.wrapProxy(super.subarray(...args).matchToScaleInfo(this));
 	};
 	fill(...args){
 		args[0] = args[0].unmdar(this.num, this.den, this.bias);
@@ -6213,7 +6246,7 @@ class _Scaled16Array extends Int16Array{
 		let arr = new Scaled16Array(str.length.div(NPE).ceil()).matchToScaleInfo(scaleInfo);
 		
 		arr.length.for(function(i){
-			arr.rawSetAt(i, parseInt(str.slice(i*NPE, (i+1)*NPE).padEnd(NPE,0),16)); // 원 데이터이므로 무조건 원 데이터로 접근해야 함
+			arr.rawSetAt(i,parseInt(str.slice(i*NPE, (i+1)*NPE).padEnd(NPE,0),16)); // 원 데이터이므로 무조건 원 데이터로 접근해야 함
 		});
 		return arr;
 	};
@@ -6224,8 +6257,26 @@ class _Scaled16Array extends Int16Array{
 			next: () => ({value:that.at(++i), done:!(i<that.length)})
 		};
 	};
-};
+	
+	
+	mid(a,b){
+		return this.subarray(a,b);
+	};
 
+	left(a){
+		return this.subarray(0,a);
+	};
+
+	right(a){
+		return this.subarray(a ? -a : Infinity);
+	};
+
+	get all(){
+		return this.subarray();
+	};
+
+
+};
 
 class Scaled16Array{ // 첨자 기능 포함
 	static DEFAULT_DEN = 100;
@@ -6261,14 +6312,24 @@ class Scaled16Array{ // 첨자 기능 포함
 	static fromHexSequenceBE(...args){
 		return this.proxy = new Proxy(_Scaled16Array.fromHexSequenceBE(...args), Scaled16Array.handler);
 	};
+	static wrapProxy(object){
+		return this.proxy = new Proxy(object, Scaled16Array.handler);
+	};
 	
 };
 
-
-
 class _Scaled32Array extends Int32Array{
 	static DEFAULT_DEN = 10000;
-	constructor(scaleInfo, array_or_size){
+	constructor(scaleInfo, array_or_size, third, fourth){
+		if(scaleInfo instanceof ArrayBuffer){
+			super(scaleInfo, array_or_size, third); // ArrayBuffer가 오면 다른 의미로 해석됨.
+			this.matchToScaleInfo({}); // Default
+			return;
+		}else if(array_or_size instanceof ArrayBuffer){ // 그 앞에 scaleInfo가, 그 바로 뒤 ArrayBuffer가 오는 경우
+			super(array_or_size, third, fourth);
+			this.matchToScaleInfo(scaleInfo);
+			return;
+		}
 		if(array_or_size === undefined){
 			if((scaleInfo.num ?? scaleInfo.den ?? scaleInfo.bias) === undefined)
 				array_or_size = scaleInfo, scaleInfo = {};
@@ -6276,7 +6337,7 @@ class _Scaled32Array extends Int32Array{
 		}
 		let num, den;
 		if(scaleInfo.num === undefined && scaleInfo.den === undefined){
-			num = 1; den = 10000;
+			num = 1; den = Scaled32Array.DEFAULT_DEN;
 		}else{
 			num = scaleInfo.num ?? 1;
 			den = scaleInfo.den ?? 1;
@@ -6308,9 +6369,9 @@ class _Scaled32Array extends Int32Array{
 	};
 	matchToScaleInfo(other){
 		this.num = other.num ?? 1;
-		this.den = other.den ?? 1;
+		this.den = other.den ?? Scaled32Array.DEFAULT_DEN;
 		this.bias = other.bias ?? 0;
-		return this;
+		return this.proxy ?? this;
 	};
 	static from(scaleInfo, iterable){
 		if(iterable === undefined){
@@ -6320,7 +6381,7 @@ class _Scaled32Array extends Int32Array{
 		}
 		let num, den;
 		if(scaleInfo.num === undefined && scaleInfo.den === undefined){
-			num = 1; den = 10000;
+			num = 1; den = Scaled32Array.DEFAULT_DEN;
 		}else{
 			num = scaleInfo.num ?? 1;
 			den = scaleInfo.den ?? 1;
@@ -6360,8 +6421,9 @@ class _Scaled32Array extends Int32Array{
 		return super[idx] = value;
 	};
 	
+	
 	map(fn){ // 매핑 연산은 무조건 64비트 실수 형으로 반환
-		return this.toFloat64Array().map(fn);
+		return this.toFloat64Array().map(fn); // Float64 형이므로 별도의 wrap 필요 없음
 	};
 	reduce(fn, init){
 		if(init === undefined)
@@ -6377,10 +6439,10 @@ class _Scaled32Array extends Int32Array{
 		return super.forEach((a,i,A) => fn(a.mda(this.num,this.den,this.bias),i,A));
 	};
 	slice(...args){
-		return super.slice(...args).matchToScaleInfo(this);
+		return Scaled32Array.wrapProxy(super.slice(...args).matchToScaleInfo(this));
 	};
 	subarray(...args){
-		return super.subarray(...args).matchToScaleInfo(this);
+		return Scaled32Array.wrapProxy(super.subarray(...args).matchToScaleInfo(this));
 	};
 	fill(...args){
 		args[0] = args[0].unmdar(this.num, this.den, this.bias);
@@ -6415,7 +6477,7 @@ class _Scaled32Array extends Int32Array{
 		let arr = new Scaled32Array(str.length.div(NPE).ceil()).matchToScaleInfo(scaleInfo);
 		
 		arr.length.for(function(i){
-			arr.rawSetAt(i, parseInt(str.slice(i*NPE, (i+1)*NPE).padEnd(NPE,0),16)); // 원 데이터이므로 무조건 원 데이터로 접근해야 함
+			arr.rawSetAt(i,parseInt(str.slice(i*NPE, (i+1)*NPE).padEnd(NPE,0),16)); // 원 데이터이므로 무조건 원 데이터로 접근해야 함
 		});
 		return arr;
 	};
@@ -6426,8 +6488,26 @@ class _Scaled32Array extends Int32Array{
 			next: () => ({value:that.at(++i), done:!(i<that.length)})
 		};
 	};
-};
+	
+	
+	mid(a,b){
+		return this.subarray(a,b);
+	};
 
+	left(a){
+		return this.subarray(0,a);
+	};
+
+	right(a){
+		return this.subarray(a ? -a : Infinity);
+	};
+
+	get all(){
+		return this.subarray();
+	};
+
+
+};
 
 class Scaled32Array{ // 첨자 기능 포함
 	static DEFAULT_DEN = 10000;
@@ -6463,8 +6543,96 @@ class Scaled32Array{ // 첨자 기능 포함
 	static fromHexSequenceBE(...args){
 		return this.proxy = new Proxy(_Scaled32Array.fromHexSequenceBE(...args), Scaled32Array.handler);
 	};
+	static wrapProxy(object){
+		return this.proxy = new Proxy(object, Scaled32Array.handler);
+	};
 	
 };
+
+class _DateArray extends Float64Array{ // 날짜 기반으로 계산, 각각에 getHours() 등을 쓸 수 있음
+	constructor(...args){
+		if(args[0] !== undefined && args[0].isArray()){
+			args[0] = args[0].map(x=>x instanceof Date ? x : new Date(x));
+		}
+		super(...args);
+	};
+	static from(iterable){
+		return super.from(iterable.$map(x=>x instanceof Date ? x : new Date(x)));
+	};
+	at(idx){
+		return new Date(super.at(idx));
+	};
+	setAt(idx, value){ // 날짜 타입의 경우는 문자열로 날짜 대입이 가능함, 단 영문 표현식으로...
+		return new Date(super.setAt(idx, value !== undefined && value.isString() ? new Date(value) : value));
+	};
+	
+	toArray(){
+		return [...this];
+	};
+	toString(){
+		return [...this].toString();
+	};
+	toStringEx(){
+		return [...this].toStringEx();
+	};
+	map(fn){ // 날짜배열의 경우 map을 쓰면 일반 배열로 처리
+		return this.toArray().map(fn);
+	};
+	slice(...args){
+		return DateArray.wrapProxy(super.slice(...args));
+	};
+	subarray(...args){
+		return DateArray.wrapProxy(super.subarray(...args));
+	};
+	
+	*[Symbol.iterator](){
+		for(let i of this.length)
+			yield new Date(this.at(i));
+	};
+};
+
+class DateArray{ // 첨자 기능 포함
+	static handler = {
+		get: (object, key) => {
+			if(typeof key !== 'symbol' && !Number.isNaN(Number(key))){
+				return object.at(key);
+			}
+			try{
+				// 날짜획득기능용... 현재 setDate 등등 날짜조작기능은 불가능함
+				if(key == 'format' || key.startsWith('get') && key in Date.prototype){
+					return (...args)=>object.map(x=>x[key](...args));
+				}
+			}catch(e){}
+			const ret = Reflect.get(object, key);
+			return typeof ret === 'function' ? ret.bind(object) : ret;
+		},
+		set: (object, key, value) => {
+			if(typeof key !== 'symbol' && !Number.isNaN(Number(key))){
+				object.setAt(key, value);
+				return true;
+			}
+			Reflect.set(object, key, value);
+			return true;
+		},
+		has: (object, key) => {
+			if(typeof key !== 'symbol' && !Number.isNaN(Number(key))){
+				return true;
+			}
+			return Reflect.has(object, key);
+		},
+	};
+	constructor(...args){
+		return this.proxy = new Proxy(new _DateArray(...args), DateArray.handler);
+	};
+	static from(...args){
+		return this.proxy = new Proxy(_DateArray.from(...args), DateArray.handler);
+	};
+	static wrapProxy(object){
+		return this.proxy = new Proxy(object, DateArray.handler);
+	};
+	
+};
+
 
 
 TYPED_ARRAY_FROM_NM['S8A'] = Scaled8Array;
@@ -6582,7 +6750,7 @@ const makeBestScaledArray = function(info, array_or_size){ // 15, 25, 2, 1 -> 16
 
 // Set 관련 연산
 // JS의 허술한 관리에 열받아서 작성함. 파이썬은 가능함.
-// 출처: https://medium.com/@ayushksingh/set-in-javascript-3bb903397f2
+// Source: https://medium.com/@ayushksingh/set-in-javascript-3bb903397f2
 
 
 Set.prototype.isSubSet  = function isSubSet(setB){
@@ -6670,9 +6838,195 @@ Map.prototype.operation = function(fn, ...args){ // Map의 경우는 연산을 �
 	return newMap;
 };
 
+// Source: https://gist.github.com/shergin/602556
+
+Date.prototype.days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+Date.prototype.months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+
+Date.prototype.military = !/\b(am|pm)\b/i.test(new Date().toLocaleTimeString());
+Date.prototype.military = false;
+
+(function () {
+	var date = new Date();
+	date.setFullYear(2013, 10, 11);
+	var string = date.toLocaleDateString();
+	var notation = '';
+	if (string.indexOf(11) == 0)
+		notation = '%d.%m.%Y';
+	else
+		if (string.indexOf('11') < string.indexOf('13'))
+			notation = '%m/%d/%y';
+		else
+			notation = '%Y-%m-%d';
+	Date.prototype.notation = notation;
+}());
 
 
+Date.prototype.parse = function(s) {
+	with(Date.prototype)
+		var methods = [
+			/*  0: nothing */ null,
+			/*  1: year    */ function(x) {this.setFullYear(x < 100 ? (x < 70 ? 2000 + x : 1900 + x) : x);},
+			/*  2: month   */ function(x) {this.setMonth(x - 1);},
+			/*  3: date    */ setDate,
+			/*  4: hours   */ setHours,
+			/*  5: minutes */ setMinutes,
+			/*  6: seconds */ setSeconds,
+			/*  7: am/pm   */ function (x) { if (x.toLowerCase() == 'pm') this.setHours(this.getHours() + 12); },
+			/*  8: 1th     */ function (x) { var y = this.getDate(); this.setDate(x); if (y > x) this.setMonth(this.getMonth() + 1); },
+			/*  9: 2y      */ function (x) { this.setFullYear(this.getFullYear() + x); },
+			/* 10: 3m      */ function (x) { this.setMonth(this.getMonth() + x); },
+			/* 11: 4w      */ function (x) { this.setDate(this.getDate() + x * 7); },
+			/* 12: 5d      */ function (x) { this.setDate(this.getDate() + x); }
+		];
+	
+	var patterns = [
+		// 10th 1y 2m 3w 4d
+		{e: /(-?\d+)\s*\-?\s*th\w*/i, p: [8]},
+		{e: /(-?\d+)\s*y\w*/i, p: [9]},
+		{e: /(-?\d+)\s*m\w*/i, p: [10]},
+		{e: /(-?\d+)\s*w\w*/i, p: [11]},
+		{e: /(-?\d+)\s*d\w*/i, p: [12]},
+		// {часы:минуты {am|pm}}
+		{e: /(^|[^\d])([012]?\d|21|22|23)\s*([\:\-\.]+)\s*([0-5]?\d)\s*(am|pm)?/i, p: [0, 4, 0, 5, 7], time: 1},
+		
+		// {mm/dd/yy, mm/dd/yyyy} (USA, etc.)
+		{e: /(^|[^\d])(0?\d|10|11|12)\s*(\/+)\s*([012]?\d|30|31)\s*\3\s*((19|20)?\d\d)([^\d]|$)/, p: [0, 2, 0, 3, 1]},
+		// {dd.mm.yy, dd.mm.yyyy, /.,-} (EU, Russia, etc.)
+		{e: /(^|[^\d])([012]?\d|30|31)\s*([\.\-\,\/]+)\s*(0?\d|10|11|12)\s*\3\s*((19|20)?\d\d)([^\d]|$)/, p: [0, 3, 0, 2, 1]},
+		// {yyyy-mm-dd, yy-mm-dd} (Canada, China, Japan, etc.)
+		{e: /(^|[^\d])((19|20)?\d\d)\s*([\.\-\/]+)\s*(0?\d|10|11|12)\s*\4\s*([012]?\d|30|31)([^\d]|$)/, p: [0, 1, 0, 0, 2, 3]}
+	];
+	
+	var allDay = true;
+	
+	for (var i = patterns.length; i--;) {
+		var pattern = patterns[i],
+			match = s.match(pattern.e);
+		
+		if (match) {
+			if (pattern.time)
+				allDay = false;
+			var pointers = pattern.p;
+			
+			for (var j = 0; j < pointers.length; j++)
+				if (pointers[j] && match[j + 1]) {
+					var value = parseInt(match[j + 1], 10);
+					methods[pointers[j]].call(this, isNaN(value) ? match[j + 1] : value);
+				}
+			
+			s = s.replace(pattern.e, '');
+		}
+	}
+	
+	this.allDay(allDay);
+	
+	return this;
+}
+
+Date.prototype.format = function(format) {
+	if (!format)
+		format = '%c';
+	
+	function leadingZeros(d) {
+		return (d < 10 ? '0' : '') + d;
+	}
+	
+	// like Python, more: http://docs.python.org/library/time.html#time.strftime
+	var patterns = {
+		//'a':																				// Locale’s abbreviated weekday name.
+		'A':	function() { return this.days[this.getDay()]; },							// Locale’s full weekday name.
+		//'b':																				// Locale’s abbreviated month name.
+		'B':	function() { return this.months[this.getMonth()]; },						// Locale’s full month name.
+		'c':	function() { return this.format('%x' + (this.allDay() ? '' : ' %X')); },	// Locale’s appropriate date and time representation.
+		'd':	function() { return leadingZeros(this.getDate()); },						// Day of the month as a decimal number [01,31].
+		'H':	function() { return leadingZeros(this.getHours()); },						// Hour (24-hour clock) as a decimal number [00,23].
+		'I':	function() { return leadingZeros(this.getHours() % 12); },					// Hour (12-hour clock) as a decimal number [01,12].
+		//'j':																				// Day of the year as a decimal number [001,366].
+		'm':	function() { return leadingZeros(this.getMonth() + 1); },					// Month as a decimal number [01,12].
+		'M':	function() { return leadingZeros(this.getMinutes()); },						// Minute as a decimal number [00,59].
+		'p':	function() { return this.getHours() < 12 ? 'AM' : 'PM'; },					// Locale’s equivalent of either AM or PM.
+		'S':	function() { return leadingZeros(this.getSeconds()); },						// Second as a decimal number [00,61].
+		//'U':																				// Week number of the year (Sunday as the first day of the week) as a decimal number [00,53]. All days in a new year preceding the first Sunday are considered to be in week 0.
+		//'w':																				// Weekday as a decimal number [0(Sunday),6].
+		//'W':																				// Week number of the year (Monday as the first day of the week) as a decimal number [00,53]. All days in a new year preceding the first Monday are considered to be in week 0.
+		'x':	function() { return this.format(this.notation); },							// Locale’s appropriate date representation.
+		'X':	function() { return this.format(this.military ? '%H:%M' : '%I:%M %p'); },	// Locale’s appropriate time representation.
+		'y':	function() { return leadingZeros(this.getFullYear() % 100); },				// Year without century as a decimal number [00,99].
+		'Y':	function() { return '' + this.getFullYear(); },								// Year with century as a decimal number.
+		//'Z':																				// Time zone name (no characters if no time zone exists).
+	};
+	
+	var context = this,
+		result = format,
+		pattern;
+	
+	function replacer() {
+		return patterns[pattern].call(context);
+	}
+	
+	for (pattern in patterns)
+		result = result.replace(
+			'%' + pattern,
+			replacer
+		);
+	
+	return result;
+}
+
+Date.prototype.timestamp = function(timestamp) {
+	if (timestamp)
+		this.setTime(timestamp * 1000);
+	return parseInt(this.valueOf() / 1000);
+}
+
+Date.prototype.allDay = function(value) {
+	if (value == undefined)
+		return this.getSeconds() == 1;
+	this.setSeconds(value ? 1 : 0);
+	return this;
+}
+
+Date.prototype.clone = function() {
+	return new Date(this.valueOf());
+}
+
+Date.prototype.date = function() {
+	return new Date(this.getFullYear(), this.getMonth(), this.getDate());
+}
+
+/*
+
+<< 응용 >>
+
+데이터프레임 예시
+
+dataFrame = [
+	3.._6, // 번호
+	['권형태', '임준호', '박민우'], // 이름
+	Scaled16Array.from([133.5,100.7,122.8]), // 키
+	Scaled16Array.from([59.7,38.6,44.8]), // 몸무게
+	DateArray.from(['2005-07-31','2007-02-22','2006-06-06']), // 생년월일
+];
+
+dataFrame = pd.DataFrame({
+	'번호':pd.Series(range(3,6)),
+	'이름':pd.Series(['권형태', '임준호', '박민우']),
+	'키':pd.Series([133.5,100.7,122.8]),
+	'몸무게':pd.Series([59.7,38.6,44.8]),
+	'생년월일':pd.Series(['2005-07-31','2007-02-22','2006-06-06'], dtype='datetime64[ns]'),
+})
 
 
+dataFrame.pick(ALL,0) -> 3번 권형태 프로필 추출
+dataFrame.pick(ALL,1) -> 4번 임준호 프로필 추출
+dataFrame.pick(ALL,2) -> 5번 박민우 프로필 추출
+
+맵타입 데이터프레임
+
+dfMap = dataFrame.$keyedMap(['번호','이름','키','몸무게','생년월일']);
+
+
+*/
 
 
