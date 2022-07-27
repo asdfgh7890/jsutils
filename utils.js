@@ -1,129 +1,11 @@
 
 // 오픈소스입니다! MIT 라이선스 적용
 
+const JSUTILS_VERSION = 20220727.0; // JS유틸 버전 코드
+
 const identical = x => x; // 항등함수
 
-const GENERAL_OPERATORS = [ // 일반 이항 연산
-	'add', 'backAdd', 'sub', 'backSub', 'mul', 'backMul', 'div', 'backDiv', // 사칙 연산
-	'padd', 'backPadd', 'psub', 'backPsub', 'pmul', 'backPmul', 'pdiv', 'backPdiv', // 정밀 보정 사칙 연산
-	'divLim0', 'divLim1', 'divLimInf', 'backDivLim0', 'backDivLim1', 'backDivLimInf', // 0/0 극한값 나눗셈 연산
-	'idiv', 'backIdiv', 'mod', 'backMod', 'dm',
-	'pow', 'backPow', 'powLim0', 'backPowLim0', 'powLim1', 'backPowLim1', 'logBase', 'backLogBase',
-	'bitwiseAnd', 'bitwiseOr', 'bitwiseXor',
-	'bitwiseLsh', 'backBitwiseLsh', 'bitwiseRsh', 'backBitwiseRsh', 'bitwiseUrsh', 'backBitwiseUrsh',
-	'lcm', 'gcd', 'least', 'greatest', 'compare', '_citrans',
-	'center', 'gcenter', 'hcenter', 'abSub', 'sqSub', 'hAbSub', 'delta', 'atan2', 'hypot', 'root', 'backRoot',
-	'fractionRound', 'fractionCeil', 'fractionFloor', 'fractionTrunc',
-	'factorRound', 'factorCeil', 'factorFloor', 'factorTrunc',
-	'digitRound', 'digitCeil', 'digitFloor', 'digitTrunc',
-	'sadd', 'backSadd', 'ssub', 'backSsub', 'smul', 'backSmul', 'sdiv', 'backSdiv', 'smod', 'backSmod', /*'sfmt',*/
-	'slsh', 'backSlsh', 'srsh', 'backSrsh',
-	'pack2', 'backPack2', 'toXY', 'toPolar', 'naValue',
-	'baseString',
-];
-
-const LOGICAL_OPERATORS = [
-	'and', 'or', 'xor', 'backAnd', 'backOr', 'backXor',
-];
-
-const BINARY_COMPARE_OPERATORS = [ // 비교 연산 (별칭까지 포함하여 작성) boolean으로 반환하므로 따로 표기
-	'less', 'leq', 'greater', 'geq', 
-	'equal', 'notEqual', 'identical', 'notIdentical',
-	'coprime', 'similar', 'notSimilar',
-	//'equalObject', 'notEqualObject', 'identicalObject', 'notIdenticalObject',
-];
-
-const UNARY_GENERAL_OPERATORS = [ // 단항 연산
-	'plus', 'minus', 'reciproc', 'abs', 'bitwiseNot', 'not',
-	'round', 'ceil', 'floor', 'trunc', 'boolean', 'modf', 'precise',
-	'exp','expm1','log','log10','log1p','pow10','square','cube','sqrt','cbrt','sign',
-	'sin','cos','tan','csc','sec','cot',
-	'asin','acos','atan','acsc','asec','acot',
-	'sinh','cosh','tanh','asinh','acosh','atanh',
-	'toRadians','toDegrees','count','validCount','strLen',
-	'splus', 'sminus', 'sreciproc',
-	'asFraction', 'NaNtoNA',
-	'pack1', 'divisors',  'percent', 'permil', 'unpercent', 'unpermil','this',
-	'toLowerCase', 'toUpperCase',
-	'hex', 'uhex', 'oct', 'bin',
-	'hexToNumber', 'octToNumber', 'binToNumber', 'decToNumber',
-	'byteCut', 'shortCut', 'intCut',
-];
-
-const UNARY_CHECK_OPERATORS = [
-	'isOdd', 'isEven', 'isPrime', 'isPositive', 'isNegative', 'isZero', 'isNaN', 'isFinite',
-];
-
-const TERNARY_GENERAL_OPERATORS = [
-	'fitInRange', 'packs', 'combined', 'fusion', 'transform', 'transCurve', 'transPower', 'transLog', 'transExp', 'alphaAdd',
-];
-
-const TERNARY_COMPARE_OPERATORS = [
-	'inRange',
-];
-
-const OBJECT_COMPARE_OPERATORS = [
-	'similarObject', 'notSimilarObject',
-	'equalObject', 'notEqualObject',
-	'identicalObject', 'notIdenticalObject',
-	'booleanObject'
-];
-
-
-const ARRAY_STATISTICAL_OPERATORS = [
-	'sum', 'mean', 'var', 'stdev', 'prod', 'min', 'max', 'powerMean',
-	'cardinality',
-];
-
-const ARRAY_UNARY_OPERATORS = [
-	'sum', 'mean', 'var', 'stdev', 'prod', 'min', 'max', 
-	'aplus', 'aminus',
-	'ascSort', 'descSort', 'ascSortByDict', 'descSortByDict', 'pop', 'shift', 'getTag','wrap',
-	'lookup',
-];
-
-const ARRAY_BINARY_OPERATORS = [
-	'aadd', 'asub', 'amul', 'amod', 'alsh', 'arsh',
-	'aand', 'aor', 'axor', //'afmt',
-	'equalEachObject', 'notEqualEachObject',
-	'identicalEachObject', 'notIdenticalEachObject',
-	'at', 'unshift', 'push', 'setTag', 'insert',
-	'sumprod',
-];
-
-const ARRAY_TERNARY_OPERATORS = ['powerMean','slice','splice','accum','near','comb'];
-
-const ARRAY_OPERATORS = [
-	...ARRAY_UNARY_OPERATORS, ...ARRAY_BINARY_OPERATORS, ...ARRAY_TERNARY_OPERATORS
-	//'subset', 'supset', 'realSubset', 'realSupset', 'supsub', 'notSupsub', 'disjoint', 'notDisjoint',
-];
-
-
-const UNARY_OPERATORS = [...UNARY_GENERAL_OPERATORS,...UNARY_CHECK_OPERATORS];
-const BINARY_OPERATORS = [...GENERAL_OPERATORS, ...LOGICAL_OPERATORS, ...BINARY_COMPARE_OPERATORS];
-const TERNARY_OPERATORS = [...TERNARY_COMPARE_OPERATORS, ...TERNARY_GENERAL_OPERATORS];
-const ALL_OPERATORS = [...BINARY_OPERATORS, ...UNARY_OPERATORS, ...TERNARY_OPERATORS, ...OBJECT_COMPARE_OPERATORS, ...ARRAY_OPERATORS];
-
-const COMPARE_OPERATORS = [...BINARY_COMPARE_OPERATORS, ...TERNARY_COMPARE_OPERATORS];
-
-const NNARY_OPERATORS = {}; // 항의 개수
-
-for(let operator of UNARY_OPERATORS){
-	NNARY_OPERATORS[operator] = 1;
-};
-
-for(let operator of BINARY_OPERATORS){
-	NNARY_OPERATORS[operator] = 2;
-};
-
-for(let operator of TERNARY_OPERATORS){
-	NNARY_OPERATORS[operator] = 3; // 3항 이상
-};
-
-for(let operator of UNARY_OPERATORS){
-	NNARY_OPERATORS[operator] = 1;
-};
-
+// 불필요한 상수 삭제
 
 const CONTINUOUSELY_COMPARE = { // 5>3>1 과 같은 비교 연산자 처리, compare의 경우 특례 적용
 	'less':true,
@@ -138,6 +20,43 @@ const CONTINUOUSELY_COMPARE = { // 5>3>1 과 같은 비교 연산자 처리, com
 	'notSimilar':true,
 };
 
+// 전체 타입 체킹 기본값 정의
+Object.defineProperty(Object.prototype, 'isNumber'      , {enumerable:false, writable:true, value:function(){return false;}});
+Object.defineProperty(Object.prototype, 'isBigInt'      , {enumerable:false, writable:true, value:function(){return false;}});
+Object.defineProperty(Object.prototype, 'isNumeric'     , {enumerable:false, writable:true, value:function(){return false;}});
+Object.defineProperty(Object.prototype, 'isString'      , {enumerable:false, writable:true, value:function(){return false;}});
+Object.defineProperty(Object.prototype, 'isBoolean'     , {enumerable:false, writable:true, value:function(){return false;}});
+Object.defineProperty(Object.prototype, 'isArray'       , {enumerable:false, writable:true, value:function(){return false;}});
+Object.defineProperty(Object.prototype, 'isGeneralArray', {enumerable:false, writable:true, value:function(){return false;}});
+Object.defineProperty(Object.prototype, 'isTypedArray'  , {enumerable:false, writable:true, value:function(){return false;}});
+Object.defineProperty(Object.prototype, 'isSequence'    , {enumerable:false, writable:true, value:function(){return false;}});
+Object.defineProperty(Object.prototype, 'isSet'         , {enumerable:false, writable:true, value:function(){return false;}});
+Object.defineProperty(Object.prototype, 'isMap'         , {enumerable:false, writable:true, value:function(){return false;}});
+Object.defineProperty(Object.prototype, 'isNA'          , {enumerable:false, writable:true, value:function(){return false;}});
+Object.defineProperty(Object.prototype, 'toStringEx'    , {enumerable:false, writable:true, value:function(){try{return this.toString();}catch(e){return e.toString();}}});
+Object.defineProperty(Object.prototype, 'naValue'       , {enumerable:false, writable:true, value:function(v){return this;}});
+Object.defineProperty(Object.prototype, 'naValueObject' , {enumerable:false, writable:true, value:function(v){return this;}});
+Object.defineProperty(Object.prototype, 'count'         , {enumerable:false, writable:true, value:function(){return 1;}});
+Object.defineProperty(Object.prototype, 'validCount'    , {enumerable:false, writable:true, value:function(){return 1;}});
+Object.defineProperty(Object.prototype, 'toInt'         , {enumerable:false, writable:true, value:function(){return Number(this).trunc();}});
+Object.defineProperty(Object.prototype, 'toFloat'       , {enumerable:false, writable:true, value:function(){return Number(this);}});
+Object.defineProperty(Object.prototype, 'toNumber'      , {enumerable:false, writable:true, value:function(){return Number(this);}});
+Object.defineProperty(Object.prototype, 'toBoolean'     , {enumerable:false, writable:true, value:function(){return Boolean(this);}});
+Object.defineProperty(Object.prototype, 'toArray'       , {enumerable:false, writable:true, value:function(){return [this];}});
+
+Number.prototype.isNumber = function(){return true;};
+BigInt.prototype.isBigInt = function(){return true;};
+Number.prototype.isNumeric = 
+BigInt.prototype.isNumeric = function(){return true;};
+String.prototype.isString = function(){return true;};
+Boolean.prototype.isBoolean = function(){return true;};
+Array.prototype.isArray = function(){return true;};
+Array.prototype.isGeneralArray = function(){return true;};
+Set.prototype.isSet = function(){return true;};
+Map.prototype.isMap = function(){return true;};
+
+BigInt.safeConvert = function(n){try{return BigInt(Math.trunc(n));}catch(e){return 0n;}};
+BigInt.hybridConvert = function(n){try{return BigInt(n);}catch(e){try{return Number(n);}catch(e){return NaN;}}};
 
 // concat은 Array에도 있는 특수성 때문에 불가
 
@@ -158,86 +77,13 @@ const ALL = true;
 const RTL = true;
 const LTR = false;
 
+
+
 ///////////////
 // 숫자 영역 //
 ///////////////
 
 // 반올림 등 함수 확장
-
-let _NA = { // 예기치 못한 오류를 방지하기 위한 특별값, 원래 값으로 반환 시 valueOf를 반환
-	toString:function(){return 'N/A';},
-	toStringEx:function(){return 'N/A';},
-	valueOf:function(){return null;},
-	
-	less:function(k){return false},
-	greater:function(k){return false;},
-	leq:function(k){return false;},
-	geq:function(k){return false;},
-	
-	equal:function(k){return this.valueOf()==k.valueOf();},
-	notEqual:function(k){return this.valueOf()!=k.valueOf();},
-	identical:function(k){return this.valueOf()===k.valueOf();},
-	notIdentical:function(k){return this.valueOf()!==k.valueOf();},
-	
-	and:function(k){return nullToNA(this.valueOf()&&k.valueOf());},
-	or:function(k){return nullToNA(this.valueOf()||k.valueOf());},
-	nc:function(k){return nullToNA(this.valueOf()??k.valueOf());},
-	
-	not:function(){return true;},
-	boolean:function(){return false;},
-	
-	inRange:function(){return false;},
-	
-	isBoolean:function(){return false;},
-	isNumber:function(){return false;},
-	isString:function(){return false;},
-	isArray:function(){return false;},
-	isNA:function(){return true;},
-	
-	count:function(){return 1;},
-	validCount:function(){return 0;},
-	strLen:function(){return this;},
-	
-	parseInt:function(){return NaN;},
-	parseFloat:function(){return NaN;},
-	typeof:'na',
-	naValue:function(v){return v.isArray() ? [this].naValue(v) : v;},
-	naValueObject:function(v){return v;},
-	
-};
-
-for(let operator of ALL_OPERATORS){
-	if(_NA[operator] === undefined)
-		_NA[operator] = function(){return this;};
-}
-
-const NA = _NA;
-
-NA.booleanObject = NA.boolean;
-NA.similarObject = NA.similar;
-NA.equalObject = NA.equal;
-NA.notEqualObject = NA.notEqual;
-NA.identicalObject = NA.identical;
-NA.notIdenticalObject = NA.notIdentical;
-
-//Error도 N/A로 취급
-
-Error.prototype.isNumber = function(){return false;};
-Error.prototype.isString = function(){return false;};
-Error.prototype.isBoolean = function(){return false;};
-Error.prototype.isArray = function(){return false;};
-Error.prototype.isNA = function(){return true;};
-Error.prototype.valueOf = function(){return null;};
-Error.prototype.toStringEx = function(){return 'N/A ('+this.toString()+')';};
-Error.prototype.naValueObject = function(v){return v;};
-
-Error.try = function(fn, ...args){try{return fn(...args);}catch(e){return e;}}
-
-
-for(let prop in NA){
-	if(Error.prototype[prop] === undefined)
-		Error.prototype[prop] = NA[prop];
-}
 
 // 안전호출 Guard(10).call('div', 0) // 에러시 에러 자체 반환
 const Guard = function(_var){
@@ -278,61 +124,92 @@ function nullToNA(x){
 	return x===null || x===undefined ? NA : x;
 };
 
-Number.prototype.typeof = 'number';
-String.prototype.typeof = 'string';
-Array.prototype.typeof = 'array';
-Boolean.prototype.typeof = 'boolean';
 
-// 선택 실행 메소드
-String.prototype.optional = 
-Boolean.prototype.optional = 
-Array.prototype.optional = 
-Number.prototype.optional = 
-Error.prototype.optional = 
-function(run_or_survive, what, ...args){
-	return run_or_survive ? this[what](...args) : this.valueOf();
-};
+// Global Fusion
+/*
+각종 유틸리티를 제공
+Array, Number 등은 Gfunc 없이도 가능
+Array.<Gfunc> 를 실행하여도 내부적으론 전역 Gfunc 이용
+*/
 
-NA.optional = function(run_or_survive, what, ...args){
-	return run_or_survive ? this[what](...args) : this;
-};
+const Gfunc = {};
+
+
+
 
 // 계산 중간 과정 디버깅 메소드
 
-String.prototype.trace = 
-Boolean.prototype.trace = 
-Array.prototype.trace = 
-Number.prototype.trace = 
-Error.prototype.trace = 
-NA.trace = function(){ // 계산 중 현재 값 확인, 스택 위치 조회 가능
-	console.trace(this);
-	return this;
+// [통합 호출 메소드]
+// 메소드 호출 뿐만 아니라 속성값을 사용하고자 할 때
+// 1. 람다식 또는 전역함수의 경우는 내부적으로 감싸서 호출됨 (ex: o.call(x=>x+5) => (x=>x+5)(o))
+// 2. 일반 메소드명은 문자열로 표기 (ex: o.call('getHours'), o.call('setHours', 10))
+// 3. 속성을 구할 때는 앞에 @를 붙여서 표기 (ex: o.call('@length'))
+// 4. 속성을 설정하고자 할 때는 뒤에 인자를 추가 (ex: o.call('@abcd', 1234))
+// 5. ScaledArray에서 실제 환산된 값을 처리하기 위해서 앞에 #을 붙여서 표기 (ex. o.call('#2'))
+// Gfunc 사용 시에는 반드시 대상 객체를 설정함
+Gfunc.call = 
+function(object, what, ...args){
+	if(typeof what == 'function') return what(object, ...args);
+	if(what.startsWith('@')){
+		if(args.length)
+			return object[what.slice(1)] = args[0];
+		return object[what.slice(1)];
+	}
+	return object[what](...args);
 };
 
-String.prototype.debug = 
-Boolean.prototype.debug = 
-Array.prototype.debug = 
-Number.prototype.debug = 
-Error.prototype.debug = 
-NA.debug = function(){ // 계산 중 현재 값 확인, 콘솔에 현재 값만 출력함
-	console.log(this);
-	return this;
+
+Gfunc.trace = 
+function(object){ // 계산 중 현재 값 확인, 스택 위치 조회 가능
+	console.trace(object);
+	return object;
 };
 
+Gfunc.debug = 
+function(object){ // 계산 중 현재 값 확인, 콘솔에 현재 값만 출력함
+	console.log(object);
+	return object;
+};
+
+// 선택 실행 메소드
+Gfunc.optional = 
+function(run_or_survive, what, ...args){
+	return run_or_survive ? this[what](...args) : (this === NA ? this : this.valueOf());
+};
 
 
 // 보호 메소드 (오류를 분석하고 실행을 계속할 필요가 있을 때)
-String.prototype.guard = 
-Boolean.prototype.guard = 
-Array.prototype.guard = 
-Number.prototype.guard = 
-Error.prototype.guard = 
-NA.guard = 
-function(what, ...args){
+Gfunc.safeCall = 
+function(object,what, ...args){
 	try{
-		return this[what](...args);
+		return Gfunc.call(object,what,...args);
 	}catch(e){return e;}
 };
+
+
+
+Function.prototype.safeCall = function(...args){ // 함수 수준에서도 세이프콜 제공
+	try{
+		return this.call(...args);
+	}catch(e){
+		return e;
+	};
+};
+
+Function.prototype.safeApply = function(...args){ // 함수 수준에서도 세이프콜 제공
+	try{
+		return this.apply(...args);
+	}catch(e){
+		return e;
+	};
+};
+
+Function.prototype.applyDB = function(object, database){ // 데이터베이스식 호출
+	let fn = this;
+	return database.map(row=>fn.apply(object, row));
+};
+
+//Math.hypot.applyDB(null, [[3,4],[1,2,2],[5,12]]) = [5,3,13]
 
 
 
@@ -352,26 +229,29 @@ function(what, ...args){
 
 // [[10,4],[2,8,7]].innerCombined(1,['@length',2],['add',7]).toStringEx();
 
-String.prototype.combined = 
-Boolean.prototype.combined = 
-Array.prototype.combined = 
-Error.prototype.combined = 
-Number.prototype.combined = 
-NA.combined = function(...operators){
-	let curr = this;
+// 중간에 '$' 을 쓸 시 원래 객체부터 다시 시작 (특히 setter 이후)
+
+// safeCombined는 Error 발생 시 그 Error 객체를 반환값으로 처리함
+
+Gfunc.combined = 
+function(object,...operators){
+	let curr = object;
 	
 	for(operator of operators){
 		if(typeof operator == 'function'){
 			curr = operator(curr);
-		}else if(operator.isArray()){
+		}else if(operator.isGeneralArray()){
 			let [[fname], args] = operator.knife(1);
 			
 			if(typeof fname == 'function'){
-				curr = fname(curr);
+				curr = fname(curr, ...args);
 			}else{
 				if(fname.endsWith(':'))
 					fname = fname.slice(0,-1);
 				
+				curr = Gfunc.call(curr, fname, ...args);
+				
+				/*
 				if(fname.startsWith('@')){
 					fname = fname.slice(1);
 					if(args[0] !== undefined)
@@ -380,13 +260,50 @@ NA.combined = function(...operators){
 						curr = curr[fname];
 				}else
 					curr = curr[fname](...args);
+				*/
 			}
+		}else if(operator == '$'){
+			curr = object;
 		}else{
-			if(operator.startsWith('@')){
-				operator = operator.slice(1);
-				curr = curr[operator];
-			}else
-				curr = curr[operator]();
+			curr = Gfunc.call(curr, operator);
+		}
+	}
+	return curr;
+};
+
+Gfunc.safeCombined = 
+function(object,...operators){
+	let curr = object;
+	
+	for(operator of operators){
+		if(typeof operator == 'function'){
+			curr = operator(curr);
+		}else if(operator.isGeneralArray()){
+			let [[fname], args] = operator.knife(1);
+			
+			if(typeof fname == 'function'){
+				curr = fname(curr, ...args);
+			}else{
+				if(fname.endsWith(':'))
+					fname = fname.slice(0,-1);
+				
+				curr = Gfunc.safeCall(curr, fname, ...args);
+				
+				/*
+				if(fname.startsWith('@')){
+					fname = fname.slice(1);
+					if(args[0] !== undefined)
+						curr[fname] = args[0];
+					else
+						curr = curr[fname];
+				}else
+					curr = curr[fname](...args);
+				*/
+			}
+		}else if(operator == '$'){
+			curr = object;
+		}else{
+			curr = Gfunc.safeCall(curr, operator);
 		}
 	}
 	return curr;
@@ -397,7 +314,7 @@ NA.combined = function(...operators){
 // [퓨전 메소드]
 
 // 혼합 연산, 평균과 표준편차 등등 동시에 구할 때 유용
-// [1,4,2,8].fusion(['sum','mean','stdev','cardinality']) = 
+// [1,4,2,8].fusion(['sum','mean','stdev','N']) = 
 
 // 매개변수가 필요한 경우 [1,4,2,8].fusion([['powerMean:', -1], ['powerMean:', 0]])
 
@@ -408,45 +325,248 @@ NA.combined = function(...operators){
 // 일반 숫자 등에 대해서도 퓨전 연산 가능
 // 10..fusion(['minus', 'reciproc',['combined:',['add',5],['mul',2]]]).toStringEx() = [-10, 0.1, 30]
 
-String.prototype.fusion = 
-Boolean.prototype.fusion = 
-Array.prototype.fusion = 
-Number.prototype.fusion = 
-Error.prototype.fusion = 
-NA.fusion = function(operators){
-	let that = this;
-	if(operators.isArray()){
+// 전역 함수에 매개변수가 있을 시에는 'fn:' 을 사용
+// '10ef'.fusion([parseInt, ['fn:', parseInt, 16]])
+
+Gfunc.fusion = 
+function(object, operators, isSafe){
+	let callfn = Gfunc.call;
+	if(isSafe) callfn = Gfunc.safeCall;
+	
+	if(typeof operators !== 'function' && operators.isGeneralArray()){
 		let [[car], cdr] = operators.knife(1);
-		if(car.isString() && car.endsWith(':')){ // 중첩 목적이 아닌 매개변수를 목적으로 한 경우 뒤에 콜론을 붙임 
-			return this[car.slice(0,-1)](...cdr);
+		
+		if(typeof car !== 'function' && car.isString() && car.endsWith(':')){ // 중첩 목적이 아닌 매개변수를 목적으로 한 경우 뒤에 콜론을 붙임 
+			if(car == 'fn:'){
+				return callfn(object, cdr[0], ...cdr.slice(1));
+			}
+			return callfn(object, car.slice(0,-1), ...cdr);
+			/*
+			if(car.startsWith('@')){ // Attribute
+				if(cdr.length)
+					return object[car.slice(1,-1)] = cdr[0]; // Set
+				else
+					return object[car.slice(1,-1)]; // Get
+			} // Method
+			return object[car.slice(0,-1)](...cdr);
+			*/
 		} // 아니면 중첩
-		return operators.map(x=>that.fusion(x));
+		return operators.map(x=>Gfunc.fusion(object,x,isSafe));
 	}
-	return this[operators]();
+	
+	// 단일 실행
+	return callfn(object, operators);
 };
 
-String.prototype.this = 
-Boolean.prototype.this = 
-Array.prototype.this = 
-Number.prototype.this = 
-Error.prototype.this = 
-NA.this = function(){return this;};
+
+Gfunc.this = 
+function(object){return object;};
+
+
+
+/*
+
+=== 이터러블 메소드 ===
+
+모두 Symbol.iterator 규정에 따름
+
+$reduce, $every, $some, $filter, $map
+ => $[fn] <=> Array.prototype.[fn] 와 동일하나 안에 함수가 없으면 항등함수 적용하고,
+    Falsy한 값을 false동작, Truthy한 값을 true동작을 취함
+
+$drop        => $filter와 반대로 동작함
+$truthyCount => 참인 것의 개수를 반환
+$truthyRate  => 전체 개수 대비 참인 것의 개수에 대한 비율 (모두 참이면 1, 거짓이면 0, 0과 1사이 값)
+$truthyInfo  => 진위값에 대한 간단한 정보 반환, .true, .false 로 가능함
+$binCount    => 각자 요소의 항목에 대하여 출현된 개수를 Map 형태로 반환
+$binRate     => 각자 요소의 항목에 대하여 출현된 개수에 대한 비율을 Map 형태로 반환, .percent() 를 통해서 백분율로 변환 가능함.
+
+*/
+
+Gfunc.$reduce = function(iterable, fn, init){
+	let it = this[Symbol.iterator]();
+	let info, av;
+	
+	if(init === undefined){
+		info = it.next();
+		if(info.done) return NA;
+		av = info.value;
+		for(info=it.next();!info.done;info=it.next()){
+			av = fn(av, info.value);
+		}
+	}else{
+		av = init;
+		for(info=it.next();!info.done;info=it.next()){
+			av = fn(av, info.value);
+		}
+	}
+	return av;
+};
+Gfunc.$every = function(iterable, fn){
+	fn ??= identical;
+	for(let e of iterable){
+		if(!fn(e))
+			return false;
+	};
+	return true;
+};
+Gfunc.$some = function(iterable, fn){
+	fn ??= identical;
+	for(let e of iterable){
+		if(fn(e))
+			return true;
+	};
+	return false;
+};
+Gfunc.$filter = function(iterable, fn){
+	fn ??= identical;
+	let array = [];
+	for(let e of iterable){
+		if(fn(e))
+			array.push(e);
+	};
+	return array;
+};
+Gfunc.$drop = function(iterable, fn){
+	fn ??= identical;
+	let array = [];
+	for(let e of iterable){
+		if(!fn(e))
+			array.push(e);
+	};
+	return array;
+};
+Gfunc.$map = function(iterable, fn){
+	fn ??= identical;
+	let array = [];
+	for(let e of iterable){
+		array.push(fn(e));
+	};
+	return array;
+};
+Gfunc.$truthyCount = function(iterable, fn){
+	fn ??= identical;
+	let tcount = 0;
+	for(let e of iterable){
+		if(fn(e))
+			tcount++;
+	};
+	return tcount;
+};
+Gfunc.$truthyRate = function(iterable, fn){
+	fn ??= identical;
+	let tcount = 0, count = 0;
+	for(let e of iterable){
+		if(fn(e))
+			tcount++;
+		count++;
+	};
+	return tcount / count;
+};
+Gfunc.$truthyInfo = function(iterable, fn){
+	fn ??= identical;
+	let tcount = 0, fcount = 0;
+	for(let e of iterable){
+		if(fn(e))
+			tcount++;
+		else
+			fcount++;
+	};
+	return {false:fcount, true:tcount, [0]:fcount, [1]:tcount, length:2, total:fcount+tcount, rate:tcount/(tcount+fcount), valueOf(){return [fcount,tcount];}, toString(){return fcount+','+tcount;}};
+};
+Gfunc.$binCount = function(iterable){
+	let bin = new Map();
+	for(let e of iterable){
+		if(bin.get(e))
+			bin.set(e, bin.get(e) + 1);
+		else
+			bin.set(e, 1);
+	}
+	return bin;
+};
+Gfunc.$binRate = function(iterable){
+	let bin = new Map();
+	let total = 0;
+	for(let e of iterable){
+		bin.set(e, (bin.get(e) ?? 0) + 1);
+		total ++;
+	}
+	for(let e of bin.keys()){
+		bin.set(e, bin.get(e) / total);
+	}
+	return bin;
+};
+Gfunc.$mapMap = function(iterable, fn){
+	fn ??= identical;
+	let map = new Map();
+	for(let e of iterable){
+		map.set(e, fn(e));
+	}
+	return map;
+};
+Gfunc.$mapSet = function(iterable, fn){
+	fn ??= identical;
+	let set = new Set();
+	for(let e of iterable){
+		set.add(fn(e));
+	}
+	return set;
+};
+Gfunc.$enumerate = function*(iterable){
+	let idx = 0;
+	for(let e of iterable){
+		yield [idx++, e];
+	}
+};
+Gfunc.$toArray = function(iterable, type, ...args){
+	if(type !== undefined) return type.from(iterable, ...args);
+	return Array.from(iterable);
+};
+Gfunc.$toSet = function(iterable){
+	return new Set(iterable);
+};
+Gfunc.$toMap = function(iterable){
+	return new Map(iterable);
+};
+Gfunc.$toEnumerateMap = function(iterable){
+	return new Map(iterable.$enumerate());
+};
+
+
+
+
+/*
+Gfunc.binary = function(A,B){ // 배열 대 배열
+	
+};
+*/
 
 // 에러 목록
 
 class ETW extends Error{
 	constructor(m){
 		super(m);
-		this.name = 'ErrorToWarning';
+		try{
+			this.name = 'Warning';
+		}catch(e){this.name = 0;}
 	}
 };
 
-class BroadcastingError extends Error{
+class SizeMismatchError extends Error{
 	constructor(m){
 		super(m);
-		this.name = 'BroadcastingError';
+		this.name = 'SizeMismatchError';
 	}
 };
+
+class KeyMismatchError extends Error{
+	constructor(m){
+		super(m);
+		this.name = 'KeyMismatchError';
+	}
+};
+
+
 
 class ArrayBoundaryError extends Error{
 	constructor(m){
@@ -455,49 +575,56 @@ class ArrayBoundaryError extends Error{
 	}
 };
 
+class TypeWarning extends Error{
+	constructor(m){
+		super(m);
+		try{
+			this.name = 'TypeWarning';
+		}catch(e){this.name = 0;}
+	}
+};
+
 
 
 
 // 이 함수는 경고로 수준을 완화한다.
-String.prototype.etw = 
-Boolean.prototype.etw = 
-Array.prototype.etw = 
-Number.prototype.etw = 
-Error.prototype.etw = 
-NA.etw = 
-function(what, ...args){
+Gfunc.etw = 
+function(object,what, ...args){
 	try{
-		return this[what](...args);
+		return object[what](...args);
 	}catch(e){console.warn(new ETW(e)); return e;}
 };
 
 // 검증 함수, falsy value일 때 throw, 보호나 경고 함수와 같이 쓸 수 있다
-String.prototype.verify = 
-Boolean.prototype.verify = 
-Array.prototype.verify = 
-Number.prototype.verify = 
-Error.prototype.verify = 
-NA.verify = 
-function(message){
-	if(!this.booleanObject()) throw new Error(message);
-	return this;
+Gfunc.verify = 
+function(object,message){
+	if(!object.booleanObject()) throw new Error(message);
+	return object;
 };
 
 // 체크 함수, 검증 함수와 달리 Warning을 적용함
-String.prototype.check = 
-Boolean.prototype.check = 
-Array.prototype.check = 
-Number.prototype.check = 
-Error.prototype.check = 
-NA.check = 
-function(message){
-	if(!this.booleanObject()) console.warn(new Error(message));
-	return this;
+Gfunc.check = 
+function(object,message){
+	if(!object.booleanObject()) console.warn(new Error(message));
+	return object;
 };
+
+
+// 전체 오브젝트에 각종 연산자 모두 추가함, null, undefined는 불가능함 
+// 그리고 for in 에 안걸리도록 조치
+
+for(let op in Gfunc){
+	Object.defineProperty(Object.prototype, op, {enumerable:false, writable:true, value:function(...args){
+		return Gfunc[op](this, ...args);
+	}});
+};
+
+//Object.defineProperty(Number.prototype, 'isNumber'      , {enumerable:false, value:function(){return true;}});
+
 
 // 결측치 대체 함수, nc 함수 폐기
 
-Number.prototype.naValue = function(v){return v.isArray() ? [this].naValue(v) : this.valueOf();};
+Number.prototype.naValue = function(v){return v.isGeneralArray() ? [this].naValue(v) : this.valueOf();};
 
 String.prototype.naValueObject = 
 Boolean.prototype.naValueObject = 
@@ -505,177 +632,725 @@ Array.prototype.naValueObject =
 Number.prototype.naValueObject = function(v){return this.valueOf();};
 
 
-Number.prototype.round = function(){return Math.round(this);};
-Number.prototype.ceil = function(){return Math.ceil(this);};
-Number.prototype.floor = function(){return Math.floor(this);};
-Number.prototype.trunc = function(){return Math.trunc(this);};
-
-Number.prototype.fractionRound = function(k){return Math.round(this * k) / k;};
-Number.prototype.fractionCeil = function(k){return Math.ceil(this * k) / k;};
-Number.prototype.fractionFloor = function(k){return Math.floor(this * k) / k;};
-Number.prototype.fractionTrunc = function(k){return Math.trunc(this * k) / k;};
-
-Number.prototype.factorRound = function(k){return Math.round(this / k) * k;};
-Number.prototype.factorCeil = function(k){return Math.ceil(this / k) * k;};
-Number.prototype.factorFloor = function(k){return Math.floor(this / k) * k;};
-Number.prototype.factorTrunc = function(k){return Math.trunc(this / k) * k;};
-
-Number.prototype.digitRound = function(p){return p>=0?this.fractionRound(10**p):this.factorRound(10**-p);};
-Number.prototype.digitCeil = function(p){return p>=0?this.fractionCeil(10**p):this.factorCeil(10**-p);};
-Number.prototype.digitFloor = function(p){return p>=0?this.fractionFloor(10**p):this.factorFloor(10**-p);};
-Number.prototype.digitTrunc = function(p){return p>=0?this.fractionTrunc(10**p):this.factorTrunc(10**(-p));};
-
-// 0.1+0.2!=0.3 방지를 위하여 불필요한 부분은 보정함
-Number.prototype.precise = function(){let k = Math.abs(Math.abs(this)*126e10 % 1 - 0.5), f = 126*10**(10-Math.max(Math.floor(Math.log10(Math.abs(this))),0)); return k >= 0.49 ? Math.round(this*f)/f : +this;};
-
 // 기본 연산자 기호화
 // 배열 연산을 위해서...
 
 // + 연산자의 혼란을 막기 위해 .add, .concat 별도 추가!
 
-Number.prototype.add = function(k){return k.isArray() ? [this].add(k) : this+parseFloat(+k);};
-Number.prototype.padd = function(k){return k.isArray() ? [this].padd(k) : (this+parseFloat(+k)).precise();};
-Number.prototype.sub = function(k){return k.isArray() ? [this].sub(k) : this-k;};
-Number.prototype.psub = function(k){return k.isArray() ? [this].psub(k) : (this-k).precise();};
-Number.prototype.mul = function(k){return k.isArray() ? [this].mul(k) : this*k;};
-Number.prototype.pmul = function(k){return k.isArray() ? [this].pmul(k) : (this*k).precise();};
-Number.prototype.div = function(k){return k.isArray() ? [this].div(k) : this/k;};
-Number.prototype.pdiv = function(k){return k.isArray() ? [this].pdiv(k) : (this/k).precise();};
-Number.prototype.divLim0 = function(k){return k.isArray() ? [this].div(k) : this==0&&k==0?0:this/k;}; // 0으로 나누기 시 문제 발생하는 코드에서의 예외처리, 단 극한의 원칙에 따른다. (분모도 0이면 분자도 0이야 극한값 존재)
-Number.prototype.divLim1 = function(k){return k.isArray() ? [this].div(k) : this==0&&k==0?1:this/k;}; // .divLim0() : 0으로 나누면 0 등등
-Number.prototype.divLimInf = function(k){return k.isArray() ? [this].div(k) : this==0&&k==0?1/this/k:this/k;}; // 무한대 처리 (내부적으로 +0, -0도 있으므로 1/k로 표현)
-Number.prototype.mod = function(k){return k.isArray() ? [this].mod(k) : this%k;};
-Number.prototype.idiv = function(k){return k.isArray() ? [this].idiv(k) : Math.trunc(this/k);};
-Number.prototype.dm = function(k){return k.isArray() ? [this].dm(k) : [this.idiv(k), this.mod(k)];};
-Number.prototype.modf = function(){return [this.idiv(1), this.mod(1)];};
-Number.prototype.powLim1 = // 0**0 == 1
-Number.prototype.pow = function(k){return k.isArray() ? [this].pow(k) : this**k;};
-Number.prototype.powLim0 = function(k){return k.isArray() ? [this].pow(k) : this==0&&k==0?0:this**k;};
-Number.prototype.plus = function(){return +this;};
-Number.prototype.minus = function(){return -this;};
-Number.prototype.reciproc = function(){return 1/this;};
-Number.prototype.bitwiseAnd = function(k){return k.isArray() ? [this].bitwiseAnd(k) : this&k;};
-Number.prototype.bitwiseOr = function(k){return k.isArray() ? [this].bitwiseOr(k) : this|k;};
-Number.prototype.bitwiseXor = function(k){return k.isArray() ? [this].bitwiseXor(k) : this^k;};
-Number.prototype.bitwiseNot = function(){return ~this;};
-Number.prototype.bitwiseLsh = function(k){return k.isArray() ? [this].bitwiseLsh(k) : this<<k;};
-Number.prototype.bitwiseRsh = function(k){return k.isArray() ? [this].bitwiseRsh(k) : this>>k;};
-Number.prototype.bitwiseUrsh = function(k){return k.isArray() ? [this].bitwiseUrsh(k) : this>>>k;};
-Number.prototype.abs = function(){return this<0?-this:+this;};
-Number.prototype.and = function(k){return k.isArray() ? [this].and(k) : nullToNA(this.valueOf()&&k.valueOf());};
-Number.prototype.or = function(k){return k.isArray() ? [this].or(k) : nullToNA(this.valueOf()||k.valueOf());};
-Number.prototype.xor = function(k){return k.isArray() ? [this].xor(k) : nullToNA(this.valueOf()&&k.valueOf() ? false : this.valueOf()||k.valueOf());};
-Number.prototype.not = function(){return !this.valueOf();};
-Number.prototype.booleanObject = 
-Number.prototype.boolean = function(){return !!this.valueOf();};
-Number.prototype.less = function(k){return k.isArray() ? [this].less(k) : this<k;};
-Number.prototype.leq = function(k){return k.isArray() ? [this].leq(k) : this<=k;};
-Number.prototype.greater = function(k){return k.isArray() ? [this].greater(k) : this>k;};
-Number.prototype.geq = function(k){return k.isArray() ? [this].geq(k) : this>=k;};
-Number.prototype.compare = function(k){return k.isArray() ? [this].compare(k) : this>k?1:this<k?-1:this==k?0:NaN;};
-Number.prototype._citrans = function(k){return k.isArray() ? [this]._citrans(k) : _CITABLE[this*2+2][k+1];};
-Number.prototype.equalObject = function(k){return this.valueOf()==k;};
-Number.prototype.equal = function(k){return k.isArray() ? [this].equal(k) : this.valueOf()==k;};
-Number.prototype.notEqualObject = function(k){return this.valueOf()!=k;};
-Number.prototype.notEqual = function(k){return k.isArray() ? [this].notEqual(k) : this.valueOf()!=k;};
-Number.prototype.similarObject = function(k){return this.valueOf()==k || k.isString() && this.toString().similar(k) || k.isNumber() && this.precise() == k.precise();};
-Number.prototype.similar = function(k){return k.isArray() ? [this].similar(k) : k.isString() ? this.toString().similar(k) : this.precise()==k.precise();};
-Number.prototype.notSimilar = function(k){return k.isArray() ? [this].notSimilar(k) : k.isString() ? this.toString().notSimilar(k) : this.precise()!=k.precise();};
-// 숫자에서는 0.1.add(0.2).similar(0.3) 이렇게 숫자가 비슷하면 참으로 처리
-// 문자에서는 대/소문자를 구별하지 않고 처리
-// 숫자,문자 혼합형 : 문자로 변환
 
-Number.prototype.equals = function(...K){ // 3==3==3
-	let last = this.valueOf();
-	for(let k of K){
-		if(!(last == k.valueOf())) return false; // NaN도 있을 수 있기에 < 로 표현 불가
-		last = k;
-	};
-	return true;
+Number.prototype.normal = function(m1, s1, m2, s2){return (this-m1)/s1*(s2??1)+(m2??0);}; // deprecation
+
+
+// 항의 개수는 .length 로 하면 찾아낼 수 있어서 굳이 unary 구별이 필요 없음
+
+Object.arithmetic = { // 산술 연산 전용, 해당 함수는 Nubmer형으로 변환된다
+	plus       : a=>+a,
+	minus      : a=>-a,
+	reciproc   : a=>1/a,
+	bitwiseNot : a=>~a,
+	abs        : a=>a < 0 ? -a : a,
+	sign       : a=>Math.sign (a),
+	exp        : a=>Math.exp  (a),
+	expm1      : a=>Math.expm1(a),
+	log        : a=>Math.log  (a),
+	log10      : a=>Math.log10(a),
+	log1p      : a=>Math.log1p(a),
+	pow10      : a=>10   **    a ,
+	percent    : a=>a*100, // % 값으로 표현
+	unpercent  : a=>a/100, // % 값을 일반형 비율로
+	permil     : a=>a*1000, // ‰ 값으로 표현
+	unpermil   : a=>a/1000, // ‰ 값을 일반형 비율로
+	square     : a=>a*a, // 제곱
+	cube       : a=>a*a*a, // 세제곱
+	sqrt       : a=>Math.sqrt(a), // 제곱근
+	cbrt       : a=>Math.cbrt(a), // 세제곱근
+	sin        : a=>Math.sin(a), // 각종 삼각함수들...
+	cos        : a=>Math.cos(a),
+	tan        : a=>Math.tan(a),
+	csc        : a=>1/Math.sin(a),
+	sec        : a=>1/Math.cos(a),
+	cot        : a=>1/Math.tan(a),
+	asin       : a=>Math.asin(a),
+	acos       : a=>Math.acos(a),
+	atan       : a=>Math.atan(a),
+	acsc       : a=>Math.asin(1/a),
+	asec       : a=>Math.acos(1/a),
+	acot       : a=>Math.atan(1/a),
+	sinh       : a=>Math.sinh(a),
+	cosh       : a=>Math.cosh(a),
+	tanh       : a=>Math.tanh(a),
+	asinh      : a=>Math.asinh(a),
+	acosh      : a=>Math.acosh(a),
+	atanh      : a=>Math.atanh(a),
+	toRadians  : a=>a/180*Math.PI, // 육십분법 -> 호도법
+	toDegrees  : a=>a*180/Math.PI, // 호도법 -> 육십분법
+	round      : a=>Math.round(a),
+	ceil       : a=>Math.ceil (a),
+	floor      : a=>Math.floor(a),
+	trunc      : a=>Math.trunc(a),
+	precise    : a=>{if(a.isBigInt()) return a; let f = 189*10**(9-Math.max(Math.floor(Math.log10(Math.abs(a))),0)), k = Math.abs(Math.abs(a)*f % 1 - 0.5); return k >= 0.498 ? Math.round(a*f)/f : +a},
+	modf       : a=>[Math.trunc(a / 1), a % 1],
+    hex        : a=>a.toString(16),
+    uhex       : a=>a.toString(16).toUpperCase(),
+    oct        : a=>a.toString(8),
+    bin        : a=>a.toString(2),
+    byteCut    : a=>(a & 0xFF) << 24 >> 24,
+    int8Cut    : a=>(a & 0xFF) << 24 >> 24,
+    int16Cut   : a=>(a & 0xFFFF) << 16 >> 16,
+    int24Cut   : a=>(a & 0xFFFFFF) << 8 >> 8,
+    int32Cut   : a=>(a & 0xFFFFFFFF),
+	hexToNumber : a=>{
+		let index = a.indexOf('.'); // 소수점 위치 찾기
+		let value = parseInt(a, 16);
+		
+		if(index == -1) return value; // 소수점 없으면 그대로 반환
+		
+		let minus = value < 0 || a.trim().charAt(0) == '-';
+		
+		index++; // 점 뒤로 이동
+		let weight = 1/16, digit;
+		for(;!isNaN(digit = parseInt(a.charAt(index),16));index++){
+			value += minus ? -weight*digit : weight*digit;
+			weight /= 16;
+		}
+		return value;
+	},
+	octToNumber : a=>parseInt(a, 8),
+	binToNumber : a=>parseInt(a, 2),
+	decToNumber : a=>parseFloat(a),
+
+	divisors   : a=>{ // 약수
+		if(!a.isNumeric()) a = Number(a);
+		
+		if(!a.isBigInt() && !Number.isSafeInteger(a.valueOf())) return Array.NaA; // 너무 큰 수 적용 불가(랙 방지), 정수가 아닌 경우 등등은 NaA 반환
+		
+		let array1 = [a.isBigInt() ? 1n : 1];
+		let array2 = [a];
+		
+		
+		if(a == 1) return array1;
+		
+		for(let i=(a.isBigInt() ? 2n : 2);i*i<=a;i++){
+			if(a % i == 0){
+				array1.push(i);
+				if(i*i!=a)
+					array2.push(a/i);
+			}
+		}
+		
+		return array1.concat(array2.reverse());
+	},
+	asFraction : (a,lim)=>{
+		if(!lim) lim = 2**16;
+		var fi = [];
+		var m, k;
+		var An = 0, Ad = 1, Bn = 1, Bd = 0, Mn, Md, i, kf;
+		
+		var x = a;
+		var sg = Math.sign(x);
+		if(sg < 0) x = -x;
+
+		for (i = 0; i < 32; i++) {
+
+			// k factor 사용
+			Mn = An + Bn;
+			Md = Ad + Bd;
+			m = Mn / Md;
+			k = (An - Ad*x) / (Bd*x - Bn);
+			if (x < m) { // Left
+				k = (Bd*x - Bn) / (An - Ad*x);
+				kf = Math.floor(k);
+				if (Ad && kf > Math.trunc((lim - Bd) / Ad)) {
+					kf = Math.trunc((lim - Bd) / Ad);
+
+					Bn = kf*An + Bn;
+					Bd = kf*Ad + Bd;
+
+					break;
+				}else if(kf < 0) break;
+
+				Bn = kf*An + Bn;
+				Bd = kf*Ad + Bd;
+
+				if (Bn / Bd == x) {
+					fi = [sg < 0 ? -Bn : Bn, Bd];
+					return fi;
+				}
+			}
+			else if (x > m) { // Right
+				kf = Math.floor(k);
+				if (Bd && kf > Math.trunc((lim - Ad) / Bd)) {
+					kf = Math.trunc((lim - Ad) / Bd);
+
+					An = An + kf*Bn;
+					Ad = Ad + kf*Bd;
+
+					break;
+				}else if(kf < 0) break;
+
+				An = An + kf*Bn;
+				Ad = Ad + kf*Bd;
+
+				if (An / Ad == x) {
+					fi = [sg < 0 ? -An : An, Ad];
+					return fi;
+				}
+			}
+			else {
+				fi = [sg < 0 ? -Mn : Mn, Md];
+				return fi;
+			}
+
+		}
+		
+		if (Math.abs(x - An / Ad) >= Math.abs(x - Bn / Bd))
+			fi = [Bn, Bd];
+		else
+			fi = [An, Ad];
+			
+		if(sg < 0) fi[0] *= -1;
+
+		return fi;
+	},
+	add        :(a,b)=>a.isBigInt() && b.isBigInt() ? a + b : Number(a) + Number(b), // Set에 이미 add가 쓰고 있어서 aug(augment 약자)을 사용함
+	aug        :(a,b)=>a.isBigInt() && b.isBigInt() ? a + b : Number(a) + Number(b), // 폐지예정
+	padd       :(a,b)=>a.isBigInt() && b.isBigInt() ? a + b : Object.operations.precise(Number(a) + Number(b)),
+	paug       :(a,b)=>a.isBigInt() && b.isBigInt() ? a + b : Object.operations.precise(Number(a) + Number(b)),
+	sub        :(a,b)=>a-b,
+	psub       :(a,b)=>Object.operations.precise(a-b),
+	delta      :(a,b)=>b-a,
+	pdelta     :(a,b)=>Object.operations.precise(b-a),
+	mul        :(a,b)=>a*b,
+	pmul       :(a,b)=>Object.operations.precise(a*b),
+	div        :(a,b)=>a/b,
+	pdiv       :(a,b)=>Object.operations.precise(a/b),
+	truediv    :(a,b)=>a%b ? Number(a)/Number(b) : a/b,
+	timed      :(a,b)=>b/a,
+	ptimed     :(a,b)=>Object.operations.precise(b/a),
+	truetimed  :(a,b)=>b%a ? Number(b)/Number(a) : b/a,
+	divLim0    :(a,b)=>a==0&&b==0?0:a/b,
+	divLim1    :(a,b)=>a==0&&b==0?1:a/b,
+	divLimInf  :(a,b)=>a==0&&b==0?1/a/b:a/b,
+	mod        :(a,b)=>a%b,
+	idiv       :(a,b)=>a.isBigInt() && b.isBigInt() ? a / b : Math.trunc(Number(a)/Number(b)),
+	pow        :(a,b)=>a**b,
+	powLim0    :(a,b)=>a==0&&b==0?0:a**b,
+	powLim1    :(a,b)=>a**b,
+	powBase    :(a,b)=>b**a,
+	root       :(a,b)=>Math.abs(b % 2) == 1 ? Math.sign(a) * (Math.abs(a) ** (1/b)) : a ** (1/b), // k제곱근, k가 홀수이고 숫자가 음수인 경우
+	bitwiseAnd :(a,b)=>a&b,
+	bitwiseOr  :(a,b)=>a|b,
+	bitwiseXor :(a,b)=>a^b,
+	bitwiseLsh :(a,b)=>a<<b,
+	bitwiseRsh :(a,b)=>a>>b,
+	bitwiseUrsh:(a,b)=>a>>>b,
+	least      :(a,b)=>a<b?a:b,
+	greatest   :(a,b)=>a>b?a:b,
+	center     :(a,b)=>(a+b)/2,         // 두 수의 산술평균
+	gcenter    :(a,b)=>Math.sqrt(a*b),  // 두 수의 기하평균
+	hcenter    :(a,b)=>2*a*b/(a+parseFloat(b)), // 두 수의 조화평균
+	abSub      :(a,b)=>Object.operations.abs(a-b),   // 뺄셈 절댓값
+	hAbSub     :(a,b)=>Math.abs(a-b)/2, // 뺄셈 절댓값 절반
+	deltaRate  :(a,b)=>(b-a)/a,         // a 대비 변화율
+	sqSub      :(a,b)=>(a-b)*(a-b),        // 뺄셈 제곱
+	atan2      :(a,b)=>Math.atan2(a,b), // 역탄젠트, 좌표 지정 (y,x)
+	hypot      :(a,b)=>Math.hypot(a,b), // 빝변 계산
+	logBase    :(a,b)=>Math.log(a) / Math.log(b),
+
+	fractionRound:(a,b)=>Math.round(a * b) / b,
+	fractionCeil :(a,b)=>Math.ceil (a * b) / b,
+	fractionFloor:(a,b)=>Math.floor(a * b) / b,
+	fractionTrunc:(a,b)=>Math.trunc(a * b) / b,
+
+	factorRound  :(a,b)=>Math.round(a / b) * b,
+	factorCeil   :(a,b)=>Math.ceil (a / b) * b,
+	factorFloor  :(a,b)=>Math.floor(a / b) * b,
+	factorTrunc  :(a,b)=>Math.trunc(a / b) * b,
+
+	digitRound   :(a,p)=>p>=0?Object.operations.fractionRound(a,10**p):Object.operations.factorRound(a,10**-p),
+	digitCeil    :(a,p)=>p>=0?Object.operations.fractionCeil (a,10**p):Object.operations.factorCeil (a,10**-p),
+	digitFloor   :(a,p)=>p>=0?Object.operations.fractionFloor(a,10**p):Object.operations.factorFloor(a,10**-p),
+	digitTrunc   :(a,p)=>p>=0?Object.operations.fractionTrunc(a,10**p):Object.operations.factorTrunc(a,10**-p),
+	
+	gcd          :(a,b)=>{ // 최대공약수
+		let t;
+		
+		while(b){
+			t = a % b;
+			a = b;
+			b = t;
+		}
+		return a <= 0 ? -a : a;
+	},
+
+	lcm          :(a,b)=>Object.operations.abs(a / Object.operations.gcd(a,b) * b), // 최소공배수
+	
+	toXY         :(a,b)=>[a*Math.cos(b),a*Math.sin(b)],
+	toPolar      :(a,b)=>[Math.hypot(a,b),Math.atan2(a,b)],
+	_citrans     :(a,b)=>_CITABLE[a*2+2][b+1],
+	
+	baseString   :(a,b)=>{
+                         	try{
+								return Number(a).toString(b);
+							}catch(e){
+								return 'NaN';
+							}
+                         },
+	
+	fitInRange :(a,b,c)                    =>Object.operations.least(Object.operations.greatest(a,b),c),
+	transform  :(x, a1, b1, a2, b2)        =>(x-a1)*(b2-a2)/(b1-a1)+a2, // 점의 위치를 내(외)분하는 비율에 맞게 변형, BigInt 때문에 곱셈을 먼저 진행
+	transCurve :(x, a1, m1, b1, a2, m2, b2)=>((x-a1)/(b1-a1))**(Math.log((m2-a2)/(b2-a2))/Math.log((m1-a1)/(b1-a1)))*(b2-a2)+a2, // 곡선형, 가운데 지점 설정
+	transPower :(x, a1, b1, p1, a2, b2, p2)=>((x-a1)/(b1-a1))**(p2/p1)*(b2-a2)+a2, // 곡선형
+	transLog   :(x, a1, b1, a2, b2)        =>((Math.log(x)-Math.log(a1))/(Math.log(b1)-Math.log(a1)))*(b2-a2)+a2, // 로그형
+	transExp   :(x, a1, b1, a2, b2)        =>Math.exp(((x-a1)/(b1-a1))*(Math.log(b2)-Math.log(a2))+Math.log(a2)), // 지수형
+	alphaAdd   :(a, b, alpha)              =>a*(1-alpha)+b*alpha, // 가중합산
+	frAlphaAdd :(a, b, anum, aden)         =>(a*(aden-anum)+b*anum)/aden, // 가중합산, 분수타입
+	mulDiv     :(a, num, den)              =>a*num/den, // 곱한 후 나누기 (Typed Int에 유용)
+	mda        :(a, num, den, bias)        =>a*num/den+bias, // 곱한 후 나누고 더함
+	unmda      :(a, num, den, bias)        =>(a-bias)*den/num, // 위의 역연산
+	unmdar     :(a, num, den, bias)        =>Math.round((a-bias)*den/num), // 위의 역연산, 반올림 적용
+	
 };
-//Number.prototype.notEquals 구현 불가, 정의가 애매모호
-Number.prototype.identicalObject = function(k){return this.valueOf()===k;};
-Number.prototype.identical = function(k){return k.isArray() ? [this].identical(k) : this.valueOf()===k;};
-Number.prototype.notIdenticalObject = function(k){return this.valueOf()!==k;};
-Number.prototype.notIdentical = function(k){return k.isArray() ? [this].notIdentical(k) : this.valueOf()!==k;};
-Number.prototype.least = function(k){return k.isArray() ? [this].least(k) : this.less(k) ? +this : k;};
-Number.prototype.greatest = function(k){return k.isArray() ? [this].greatest(k) : this.greater(k) ? +this : k;};
-Number.prototype.sign = function(){return Math.sign(this);};
-Number.prototype.exp = function(){return Math.exp(this);};
-Number.prototype.expm1 = function(){return Math.expm1(this);};
-Number.prototype.log = function(){return Math.log(this);};
-Number.prototype.logBase = function(k){return k.isArray() ? [this].logBase(k) : Math.log(this) / Math.log(k);};
-Number.prototype.log10 = function(){return Math.log10(this);};
-Number.prototype.log1p = function(){return Math.log1p(this);};
-Number.prototype.pow10 = function(){return 10 ** this;};
-Number.prototype.center = function(k){return k.isArray() ? [this].center(k) : (this+k)/2;}; // 등차중항
-Number.prototype.gcenter = function(k){return k.isArray() ? [this].gcenter(k) : (this*k).sqrt();}; // 등비중항
-Number.prototype.hcenter = function(k){return k.isArray() ? [this].hcenter(k) : 2*this*k/(this+parseFloat(k));}; // 조화중항
-Number.prototype.abSub = function(k){return k.isArray() ? [this].abSub(k) : Math.abs(this-k);}; // 뺄셈 절댓값
-Number.prototype.hAbSub = function(k){return k.isArray() ? [this].hAbSub(k) : Math.abs(this-k)/2;}; // 뺄셈 절댓값 절반
-Number.prototype.delta = function(k){return k.isArray() ? [this].delta(k) : (k-this)/this;}; // 변화량 (자신 객체값 기준)
-Number.prototype.sqSub = function(k){return k.isArray() ? [this].sqSub(k) : (this-k)**2;}; // 뺄셈 제곱
-Number.prototype.atan2 = function(k){return k.isArray() ? [this].atan2(k) : Math.atan2(this,k);};
-Number.prototype.hypot = function(k){return k.isArray() ? [this].hypot(k) : Math.hypot(this,k);}; // 피타고라스 정리
-Number.prototype.toXY = function(k){return k.isArray() ? [this].toXY(k) : [this*Math.cos(k),this*Math.sin(k)];}; // 극좌표->직교좌표
-Number.prototype.toPolar = function(k){return k.isArray() ? [this].toPolar(k) : [Math.hypot(k,this),Math.atan2(k,this)];}; // 직교좌표->극좌표
-Number.prototype.percent = function(){return this*100;}; // % 값으로 표현
-Number.prototype.unpercent = function(){return this/100;}; // % 값을 일반형 비율로
-Number.prototype.permil = function(){return this*1000;}; // ‰ 값으로 표현
-Number.prototype.unpermil = function(){return this/1000;}; // ‰ 값을 일반형 비율로
-Number.prototype.square = function(){return this*this;}; // 제곱
-Number.prototype.cube = function(){return this**3;}; // 세제곱
-Number.prototype.sqrt = function(){return Math.sqrt(this);}; // 제곱근
-Number.prototype.cbrt = function(){return Math.cbrt(this);}; // 세제곱근
-Number.prototype.root = function(k){return k.isArray() ? [this].root(k) : Math.abs(k % 2) == 1 ? Math.sign(this) * (Math.abs(this) ** (1/k)) : this ** (1/k);}; // k제곱근, k가 홀수이고 숫자가 음수인 경우
-Number.prototype.sin = function(){return Math.sin(this);}; // 각종 삼각함수들...
-Number.prototype.cos = function(){return Math.cos(this);};
-Number.prototype.tan = function(){return Math.tan(this);};
-Number.prototype.csc = function(){return 1/Math.sin(this);};
-Number.prototype.sec = function(){return 1/Math.cos(this);};
-Number.prototype.cot = function(){return 1/Math.tan(this);};
-Number.prototype.asin = function(){return Math.asin(this);};
-Number.prototype.acos = function(){return Math.acos(this);};
-Number.prototype.atan = function(){return Math.atan(this);};
-Number.prototype.acsc = function(){return Math.asin(1/this);};
-Number.prototype.asec = function(){return Math.acos(1/this);};
-Number.prototype.acot = function(){return Math.atan(1/this);};
-Number.prototype.sinh = function(){return Math.sinh(this);};
-Number.prototype.cosh = function(){return Math.cosh(this);};
-Number.prototype.tanh = function(){return Math.tanh(this);};
-Number.prototype.asinh = function(){return Math.asinh(this);};
-Number.prototype.acosh = function(){return Math.acosh(this);};
-Number.prototype.atanh = function(){return Math.atanh(this);};
-Number.prototype.toRadians = function(){return this/180*Math.PI;}; // 육십분법 -> 호도법
-Number.prototype.toDegrees = function(){return this*180/Math.PI;}; // 호도법 -> 육십분법
 
-Number.prototype.inRange = function(u, v, boundary){ // 해당 범위 이내로 들어왔는지 체크, boundary는 경계선으로 수학에서 쓰던 기호와 동일
-	if(boundary === undefined) boundary = '[]';
-	switch(boundary){
-		// 범위 내
-		case '()':
-		return u<this && this<v;
-		case '[)':
-		return u<=this && this<v;
-		case '[]':
-		return u<=this && this<=v;
-		case '(]':
-		return u<this && this<=v;
-		// 범위 외
-		case ')(':
-		return this<u || this>v;
-		case ')[':
-		return this<u || this>=v;
-		case '][':
-		return this<=u || this>=v;
-		case '](':
-		return this<=u || this>v;
-		default:
-		return false;
+Object.string = {
+	splus      : (a)=>a.isString() ? a : a.toString(),           // 문자열 양수연산 - 변환
+	sminus     : (a)=>a.isString() ? a.reverse() : a.toString().reverse(), // 문자열 음수연산 - 뒤집기
+	sreciproc  : (a)=>a.split(''),            // 문자열 역수연산 - 분해
+	strlen     : (a)=>a.isString() ? a.length : a.toString().length,    // 문자열 크기연산 - 길이
+	sadd       : (a,k)=>(a.isString() ? null : a = a.toString(), a.concat(k)),          // 문자열 덧셈연산 - 결합
+	ssub       : (a,k)=>(a.isString() ? null : a = a.toString(), a.replaceAll(k,'')),   // 문자열 뺄셈연산 - 제외
+	smul       : (a,k)=>{                     // 문자열 곱셈연산 - 반복, 소수점 사용 가능
+		try{
+			if(!a.isString()) a = a.toString();
+			let [i, f] = Object.operations.modf(Math.abs(parseFloat(+k))); f = Math.round(f * a.length); return k>=0?a.repeat(i).concat(a.substr(0,f)) : a.substr(a.length-f).concat(a.repeat(i)).reverse();
+		}catch(e){return '#'+e.toString();}
+	},
+	sdiv       : (a,k)=>{
+		if(!a.isString()) a = a.toString();
+		if(k.isNumber()){ // 수로 나눌 경우 해당 개수로 절단
+			let arr = [];
+			if(k > 0){ // 양수는 앞에서부터
+				for(let i=0;i<a.length;i+=k){
+					arr.push(a.slice(i,i+k));
+				}
+			}else if(k < 0){ // 음수는 뒤에서부터
+				for(let i=0;i>-a.length;i+=k){
+					arr.push(a.slice(i+k,i?i:Infinity));
+				}
+				arr.reverse();
+			}else{ // 0으로 나누는 것은 NaA 반환
+				return Array.NaA;
+			}
+			
+			return arr;
+		}
+		return a.split(k);
+	},
+	smod       : (a,k)=>(a.isString() ? null : a = a.toString(), k>=0?a.slice(0,k):a.slice(k)),
+	slrot      : (a,k)=>(a.isString() ? null : a = a.toString(), a.slice(k).concat(a.slice(0,k))),
+	srrot      : (a,k)=>(a.isString() ? null : a = a.toString(), a.slice(-k).concat(a.slice(0,-k))),
+};
+
+// [similar/exact] 관련
+
+// 숫자에서는 0.1.add(0.2).similar(0.3) 이렇게 숫자가 비슷하면 참으로 처리
+// 문자에서는 대/소문자를 구별하지 않고 처리 (대문자로 취급)
+// 숫자,문자 혼합시 제대로 계산이 되지 않을 수 있음
+
+
+Object.comparison = {
+	numeric:{
+		isOdd:(a)=>Math.abs(a) % 2 == 1,
+		isEven:(a)=>a % 2 == 0,
+		isPositive:(a)=>a > 0,
+		isNegative:(a)=>a < 0,
+		isZero:(a)=>a.valueOf() == 0,
+		isNaN:(a)=>isNaN(a),
+		isFinite:(a)=>isFinite(a),
+		isInfinite:(a)=>!isNaN(a) && !isFinite(a),
+		isPrime:(a)=>
+		{ // 소수 여부
+			if(!Number.isSafeInteger(a.valueOf())) return false; // 너무 큰 수 적용 불가(랙 방지), 정수가 아니거나 1은 소수로 취급 안함
+			for(let i=2;i*i<=a;i++){
+				if(a % i == 0) return false;
+			}
+			return true;
+		},
+		isCoprime:(a,b)=>Object.operations.gcd(a,b) == 1,
+	},
+	sizing:{ // 크기 비교
+		// 일반 비교 연산자
+		less:(a,b)=>a.valueOf()<b.valueOf(),
+		greater:(a,b)=>a.valueOf()>b.valueOf(),
+		leq:(a,b)=>a.valueOf()<=b.valueOf(),
+		geq:(a,b)=>a.valueOf()>=b.valueOf(),
+		// 오차 허용 비교 연산자
+		exactLess:(a,b)=>Object.operations.pou(a)<Object.operations.pou(b),
+		exactGreater:(a,b)=>Object.operations.pou(a)>Object.operations.pou(b),
+		exactLeq:(a,b)=>Object.operations.pou(a)<=Object.operations.pou(b),
+		exactGeq:(a,b)=>Object.operations.pou(a)>=Object.operations.pou(b),
+		// 논리형이 아닌 비교 연산자
+		compare:(a,b)=>{let A=a.valueOf(), B=b.valueOf(); return A<B?-1:A>B?1:A==B?0:NaN;},
+		similarCompare:(a,b)=>{let A=Object.operations.pou(a), B=Object.operations.pou(b); return A<B?-1:A>B?1:A==B?0:NaN;},
+		inRange:(a,u,v,boundary)=>{ // 해당 범위 이내로 들어왔는지 체크, boundary는 경계선으로 수학에서 쓰던 기호와 동일
+			if(boundary === undefined) boundary = '[]';
+			switch(boundary){
+				// 범위 내
+				case '()':
+				return u<a && a<v;
+				case '[)':
+				return u<=a && a<v;
+				case '[]':
+				return u<=a && a<=v;
+				case '(]':
+				return u<a && a<=v;
+				// 범위 외
+				case ')(':
+				return a<u || a>v;
+				case ')[':
+				return a<u || a>=v;
+				case '][':
+				return a<=u || a>=v;
+				case '](':
+				return a<=u || a>v;
+				default:
+				return false;
+			}
+		},
+	},
+	equality:{ // 상등 비교
+		equal:(a,b)=>a.valueOf()==b.valueOf(),
+		notEqual:(a,b)=>a.valueOf()!=b.valueOf(),
+		
+		// 타입 일치 비교 연산자
+		identical:(a,b)=>a.valueOf()===b.valueOf(),
+		notIdentical:(a,b)=>a.valueOf()!==b.valueOf(),
+		
+		similar:(a,b)=>Object.operations.pou(a)==Object.operations.pou(b),
+		notSimilar:(a,b)=>Object.operations.pou(a)!=Object.operations.pou(b),
+	},
+};
+
+
+Object.logical = {
+	not:(a)=>!a.valueOf(),
+	boolean:(a)=>!!a.valueOf(),
+	and:(a,b)=>a.valueOf()&&b.valueOf(),
+	or :(a,b)=>a.valueOf()||b.valueOf(),
+	xor:(a,b)=>a.valueOf()&&b.valueOf() ? false : a.valueOf()||b.valueOf(),
+	nand:(a,b)=>!(a.valueOf()&&b.valueOf()),
+	nor:(a,b)=>!(a.valueOf()||b.valueOf()),
+	xnor:(a,b)=>!(a.valueOf()||b.valueOf()) ? true : a.valueOf()&&b.valueOf(),
+	eqv:(a,b)=>!(a.valueOf()||b.valueOf()) ? true : a.valueOf()&&b.valueOf(), // xnor == eqv
+};
+
+Object.other = {
+	pou:(a)=> (a = a.valueOf(), typeof a == 'string' ? a.toUpperCase() : Object.operations.precise(a)), // 숫자는 정밀화, 영문은 대문자화
+	pack1:(a   )=> [a],
+	pack2:(a,b )=> [a, b],
+	packs:(...A)=> [...A],
+};
+
+
+class NAObject{ // 예기치 못한 오류를 방지하기 위한 특별값, 원래 값으로 반환 시 valueOf를 반환
+	
+};
+
+const NA = new NAObject(); // 빈 클래스라도 일단은 생성
+
+
+
+// 모든 연산자를 구별 없이 가능하도록 조치
+Object.assign((Object.operations = {}), 
+	Object.arithmetic, Object.string, Object.comparison.numeric, Object.comparison.sizing, Object.comparison.equality, Object.logical, Object.other
+);
+
+// 네이티브 메소드를 전 오브젝트로 확장
+for(const ob of [String.prototype.padStart, String.prototype.padEnd, String.prototype.concat, String.prototype.toLowerCase, String.prototype.toUpperCase, String.prototype.trim, String.prototype.split]){
+	Object.defineProperty(Object.prototype, ob.name, {enumerable:false, writable:true, value:ob});
+};
+
+/*
+
+이터러블-스칼라 연산
+
+5..sub(5)  // 단순히 5과 5를 빼서 0 반환
+5..$sub(5) // 왼쪽을 이터러블, 오른쪽을 스칼라로 처리, [0-5,1-5,2-5,3-5,4-5] = [-5,-4,-3,-2,-1]
+5..sub$(5) // 왼쪽을 이터러블, 오른쪽을 이터러블로 처리, [5-0,5-1,5-2,5-3,5-4] = [5,4,3,2,1]
+5..$sub$(5)// 양쪽을 이터러블로 처리, [0-0,1-1,2-2,3-3,4-4] = [0,0,0,0,0], 사이즈 일치 필수
+
+배열의 경우
+
+[5,7].pow([2,3]) = [25, 343] // 배열의 규칙에 따라 각각 연산함
+[5,7].$pow([2,3]) = [5..pow([2,3]), 7..pow([2,3])] = [[25,125],[49,343]]
+[5,7].pow$([2,3]) = [[5,7].pow(2), [5,7].pow(3)] = [[25,49],[125,343]]
+[5,7].$pow$([2,3]) = [5..pow(2), 7..pow(3)] = [25, 343]
+
+문자열의 경우
+
+'ab'.sadd('cd') = 'abcd'
+'ab'.$sadd('cd') = ['acd', 'bcd']
+'ab'.sadd$('cd') = ['abc', 'abd']
+'ab'.$sadd$('cd') = ['ac', 'bd']
+
+단항 연산, 리듀싱 연산은 앞에 $만 가능함
+
+5..$minus() // [-1,-2,-3,-4,-5]
+5..$add()   // 10
+
+삼항 이상의 연산은 괄호의 첫 인자에만 적용됨
+
+5..alphaAdd$(10,0.7) // [7,7.3,7.6,7.9,8.2]
+
+5..alphaAdd(0.._10,0.7) // [1.5,2.2,2.9,3.6,4.3,5,5.7,6.4,7.1,7.8]
+
+일반 연산
+
+5..call((x,y)=>4*x+7*y, 5) // 4*5+7*5 = 55
+5..$call((x,y)=>4*x+7*y, 5) // [35,39,43,47,51]
+5..call$((x,y)=>4*x+7*y, 5) // [20,27,34,41,48]
+5..$call$((x,y)=>4*x+7*y, 5) // [0,11,22,33,44]
+
+앞 뒤에 _ 를 각각 붙여서 Operator Overloadable JS 에 대비
+5.._add_(8) = 13
+new Date()._div_(1000) = 1658884563.03 (계속 변함, valueOf가 Primitive한 모든 객체에 적용가능)
+
+Normal JS:
+
+[10,23] * [8,42] = NaN
+
+Operator Overloadable JS:
+
+[10,23] * [8,42] = [80,966]
+-> [10,20]._mul_([8,42]) 로 해석함
+
+
+*/
+
+for(const op in Object.operations){
+	//if(Object.operations[op].length)
+	Object.defineProperty(Object.prototype, '$'+op, {enumerable:false, writable:true, value:function(...args){
+		let array = [];
+		for(const e of this){
+			array.push(e[op](...args));
+		};
+		return array;
+	}});
+	Object.defineProperty(Object.prototype, op+'$', {enumerable:false, writable:true, value:function(...args){
+		let array = [];
+		let cdr = args.slice(1);
+		for(const e of args[0]){
+			array.push(this[op](e, ...cdr));
+		};
+		return array;
+	}});
+	Object.defineProperty(Object.prototype, '$'+op+'$', {enumerable:false, writable:true, value:function(...args){
+		let array = [];
+		let it = this[Symbol.iterator](), info = it.next();
+		let cdr = args.slice(1);
+		for(const e of args[0]){
+			if(info.done) throw new SizeMismatchError('좌변이 먼저 종료되었습니다.');
+			array.push(info.value[op](e, ...cdr));
+			info = it.next();
+		};
+		if(!info.done) throw new SizeMismatchError('우변이 먼저 종료되었습니다.');
+		return array;
+	}});
+	Object.defineProperty(Object.prototype, '_'+op+'_', {enumerable:false, writable:true, value:function(...args){
+		return this.valueOf()[op](...args);
+	}});
+	
+}
+
+for(const op of ['call', 'safeCall']){
+	Object.defineProperty(Object.prototype, '$'+op, {enumerable:false, writable:true, value:function(what, ...args){
+		try{
+			let array = [];
+			for(const e of this){
+				array.push(e[op](what, ...args));
+			};
+			return array;
+		}catch(e){
+			if(op == 'safeCall') return e; // 안전호출의 경우 이 것도 역시 안전처리를 하고 아니면 그대로 에러 발생
+			throw e;
+		}
+	}});
+	Object.defineProperty(Object.prototype, op+'$', {enumerable:false, writable:true, value:function(what, ...args){
+		try{
+			let array = [];
+			let cdr = args.slice(1);
+			for(const e of args[0]){
+				array.push(this[op](what, e, ...cdr));
+			};
+			return array;
+		}catch(e){
+			if(op == 'safeCall') return e;
+			throw e;
+		}
+	}});
+
+	Object.defineProperty(Object.prototype, '$'+op+'$', {enumerable:false, writable:true, value:function(what, ...args){
+		try{
+			let array = [];
+			let it = this[Symbol.iterator](), info = it.next();
+			let cdr = args.slice(1);
+			for(const e of args[0]){
+				if(info.done) throw new SizeMismatchError('우변이 먼저 종료되었습니다.');
+				array.push(info.value[op](what, e, ...cdr));
+				info = it.next();
+			};
+			if(!info.done) throw new SizeMismatchError('좌변이 먼저 종료되었습니다.');
+			return array;
+		}catch(e){
+			if(op == 'safeCall') return e;
+			throw e;
+		}
+	}});
+}
+
+
+
+
+
+// 일반 객체에 대해서도 연산 가능하도록 조치
+// 배열 내부 연산 백엔드는 .unary, .binary 등을 주어서 다시 작성하지 않아도 모든 연산이 가능하도록 조치
+/*
+for(let op in Object.operations){
+	Object.defineProperty(Object.prototype, op, {enumerable:false, writable:true, value:function(...args){
+		if(this.isArray()){ // 배열인 경우
+			switch(Object.operations[op].length){
+				case 1:  return this.unary(op, );
+				case 2:  return this.binary(op, args[0]);
+				default: return this.ternary(op, ...args);
+			}
+		} // 배열이 아닌 경우
+		if(args.length && args.some(x=>x.isArray())){ // 배열간 연산시 배열 연산 시행, 배열로 변환 후 위를 재귀 실행
+			if(args.every(x=>x.isTypedArray())) // 모두 형식이 있는 배열은 Float64기반 연산
+				return new Float64Array([this])[op](...args);
+			else // 그 외는 일반 배열 연산
+				return [this][op](...args);
+		}else // 배열이 아닌 경우 숫자연산
+			return Object.operations[op](this.valueOf(), ...args); // 숫자 연산 진행
+	}});
+}
+*/
+
+Object.makeCalculable = function(Class){ // 계산가능한 객체를 만들기 위한 것으로 Object.makeCalculable(클래스명) 으로 호출
+	for(const op in Object.operations){
+		Object.defineProperty(Class.prototype, op, {enumerable:false, writable:true, value:function(...args){
+			if(this.isArray()){ // 배열인 경우
+				switch(Object.operations[op].length){
+					case 1:  return this.unary(op, );
+					case 2:  return this.binary(op, args[0]);
+					default: return this.ternary(op, ...args);
+				}
+			}
+			if(this.isMap()){
+				return this.operation(op, ...args);
+			}
+			// 배열이 아닌 경우
+			if(args.length && args.some(x=>x.isArray())){ // 배열간 연산시 배열 연산 시행, 배열로 변환 후 위를 재귀 실행
+				if(args.every(x=>x.isTypedArray())) // 모두 형식이 있는 배열은 Float64기반 연산
+					return new Float64Array([this])[op](...args);
+				else // 그 외는 일반 배열 연산
+					return [this][op](...args);
+			}else{ // 배열이 아닌 경우 숫자연산
+				if(this.valueOf().isBigInt() || args.some(x=>x.valueOf().isBigInt())){ // 큰수 발견 시
+					try{
+						return Object.operations[op](this.valueOf(), ...args); // 일단 연산 진행
+					}catch(e){
+						console.warn(new TypeWarning(e.message.replace('must','should')+'\nNumber 타입으로 모두 형변환 하여 다시 계산하였습니다.'));
+						return Object.operations[op](Number(this), ...args.map(x=>x.valueOf().isBigInt() ? Number(x) : x)); // 숫자 연산 진행
+					}
+				}
+				return Object.operations[op](this.valueOf(), ...args); // 큰수 없을 시 일반연산 진행
+			}
+		}});
 	}
 };
 
-Number.prototype.fitInRange = function(u, v){return this.greatest(u).least(v);} // [u, v] 범위에 벗어나면 맞게 조정
+for(const Class of [Number, Boolean, BigInt, String, Array, Uint8Array, Uint16Array, Uint32Array, Int8Array, Int16Array, Int32Array, Float32Array, Float64Array, Error, NAObject, Map]){
+	
+	Object.makeCalculable(Class);
+	
+}
+// 오류가 발생하여 필요한 일부 클래스로 축소, d3.js에서 if('xxx' in xxx) 에 문제가 있었는 모양
+
+
+// 기저 메소드 추가 후 NA, Error 등에 해당 정보를 추가함
+Object.assign(NAObject.prototype, {
+	toStringEx:function(){return 'N/A';},
+	
+	less:function(k){return false;},
+	greater:function(k){return false;},
+	leq:function(k){return false;},
+	geq:function(k){return false;},
+	exactLess:function(k){return false;},
+	exactGreater:function(k){return false;},
+	exactLeq:function(k){return false;},
+	exactGeq:function(k){return false;},
+	
+	not:function(){return true;},
+	boolean:function(){return false;},
+	
+	inRange:function(){return false;},
+	
+	isNA:function(){return true;},
+	
+	count:function(){return 1;},
+	validCount:function(){return 0;},
+	strlen:function(){return this;},
+	
+	parseInt:function(){return NaN;},
+	parseFloat:function(){return NaN;},
+	typeof:'na',
+	naValue:function(v){return v.isGeneralArray() ? [this].naValue(v) : v;},
+	naValueObject:function(v){return v;},
+	
+	NAtoNaN:function(){return NaN;},
+	valueOf:function(){return NaN;},
+});
+Object.assign(Error.prototype, NAObject.prototype); // 에러 객체도 NA와 동일한 것으로 간주
+
+
+// 일치 비교 연산자는 객체 자체로도 비교 가능하도록 별도 조치
+
+for(let op in Object.comparison.equality){
+	Object.defineProperty(Object.prototype, op+'Object', {enumerable:false, writable:true, value:function(...args){
+		return Object.operations[op](this, ...args); // 통째 비교이므로..
+	}});
+};
+
+
+
+//Error도 N/A로 취급
+
+// isXXX 에서 false인 것은 이제 필요 없다!
+
+
+NA.toString = function(){return 'N/A';};
+Error.prototype.toStringEx = function(){return 'N/A ('+this.toString()+')';};
+
+Error.prototype.getReasonVariable = function(){ // 문제가 발생한 변수 반환
+	try{
+		if(/\'[A-Za-z_$0-9]+\'/.test(this.message))
+			return this.message.match(/\'[A-Za-z_$0-9]+\'/).toString().slice(1,-1);
+		return this.message.match(/[A-Za-z_$0-9]+ is/).toString().slice(0,-' is'.length);
+	}catch(e){
+		return '';
+	}
+};
+
+Error.prototype.__defineGetter__('stackArray', function(){
+	try{
+	return this.stack.split('\n').slice(1).map(x=>x.trim().slice(3));
+	}catch(e){return [];}
+});
+
+Function.prototype.isFunction = function(){return true;};
+
+Error.try = function(fn, ...args){try{return fn(...args);}catch(e){return e;}}
+
 
 /*
 트랜스폼 메소드
@@ -707,12 +1382,6 @@ Array.linspace(0,100,6).transCurve(0,40,100,0,60,100).round()      = [0,41,60,75
 
 */
 
-Number.prototype.transform = function(a1, b1, a2, b2){a2??=0; b2??=1; return (this-a1)/(b1-a1)*(b2-a2)+a2;}; // 점의 위치를 내(외)분하는 비율에 맞게 변형
-Number.prototype.transCurve = function(a1, m1, b1, a2, m2, b2){a2??=0; m2??=0.5; b2??=1; return ((this-a1)/(b1-a1))**(Math.log((m2-a2)/(b2-a2))/Math.log((m1-a1)/(b1-a1)))*(b2-a2)+a2;}; // 곡선형, 가운데 지점 설정
-Number.prototype.transPower = function(a1, b1, p1, a2, b2, p2){a2??=0; b2??=1; p2??=1; return ((this-a1)/(b1-a1))**(p2/p1)*(b2-a2)+a2;}; // 곡선형
-Number.prototype.transLog = function(a1, b1, a2, b2){a2??=0; b2??=1; return ((this.log()-a1.log())/(b1.log()-a1.log()))*(b2-a2)+a2;}; // 로그형
-Number.prototype.transExp = function(a1, b1, a2, b2){a2??=1; b2??=Math.E; return (((this-a1)/(b1-a1))*(b2.log()-a2.log())+a2.log()).exp();}; // 지수형
-
 /*
 
 가중덧셈
@@ -723,68 +1392,13 @@ Number.prototype.transExp = function(a1, b1, a2, b2){a2??=1; b2??=Math.E; return
 
 */
 
-Number.prototype.alphaAdd = function(k, alpha){return k.isArray() ? [this].alphaAdd(k, alpha) :  this*(1-alpha)+k*alpha;}; // 가중합산
-
 
 // 숫자에서의 문자열 연산, 곱셈을 적용하는 특별한 경우 제외 모두 문자열과의 연산이므로 모두 문자열로 위탁함
 
-Number.prototype.concat = function(...K){return this.toString().concat(...K);};
-Number.prototype.concatFrom = function(...K){return K.reverseCopy().join('').concat(this);};
-
-
-Number.prototype.splus = function(k){return this.toString().valueOf();};
-Number.prototype.sminus = function(k){return this.toString().sminus();};
-Number.prototype.sreciproc = function(k){return this.toString().sreciproc();};
-
-Number.prototype.sadd = function(k){return k.isArray() ? [this].sadd(k) : this.toString().sadd(k);};
-Number.prototype.backSadd = function(k){return k.isArray() ? [this].backSadd(k) : this.toString().backSadd(k);};
-
-Number.prototype.ssub = function(k){return k.isArray() ? [this].ssub(k) : this.toString().ssub(k);}; // String으로 변환 후 String에서 연산함
-Number.prototype.backSsub = function(k){return k.isArray() ? [this].backSsub(k) : this.toString().backSsub(k);};
-
-Number.prototype.smul = function(k){return k.isArray() ? [this].smul(k) : this.toString().smul(k);};
-Number.prototype.backSmul = function(k){return k.isArray() ? [this].backSmul(k) : k.toString().smul(this);}; 
-
-Number.prototype.sdiv = function(k){return k.isArray() ? [this].sdiv(k) : this.toString().sdiv(k);};
-Number.prototype.backSdiv = function(k){return k.isArray() ? [this].backSdiv(k) : k.toString().sdiv(this);};
-
-Number.prototype.smod = function(k){return k.isArray() ? [this].smod(k) : this.toString().smod(k);};
-Number.prototype.backSmod = function(k){return k.isArray() ? [this].backSmod(k) : k.toString().smod(this);}; 
-
-Number.prototype.slsh = function(k){return k.isArray() ? [this].slsh(k) : this.toString().slsh(k);};
-Number.prototype.backSlsh = function(k){return k.isArray() ? [this].backSlsh(k) : k.toString().slsh(this);}; 
-
-Number.prototype.srsh = function(k){return k.isArray() ? [this].srsh(k) : this.toString().srsh(k);};
-Number.prototype.backSrsh = function(k){return k.isArray() ? [this].backSrsh(k) : k.toString().srsh(this);}; 
-
-Number.prototype.sdivN = function(k){return k.isArray() ? [this].sdivN(k) : this.toString().sdivN(k);};
-Number.prototype.backSdivN = function(k){return k.isArray() ? [this].backSdivN(k) : k.toString().sdivN(this);}; 
-
-Number.prototype.toLowerCase = String.prototype.toLowerCase;
-Number.prototype.toUpperCase = String.prototype.toUpperCase;
 
 // 진법 변환하여 문자열로
-Number.prototype.hex = function(){ return this.toString(16); };
-Number.prototype.uhex = function(){ return this.toString(16).toUpperCase(); };
-Number.prototype.oct = function(){ return this.toString(8); };
-Number.prototype.bin = function(){ return this.toString(2); };
 
-// signed integer 처리
-Number.prototype.byteCut = function(){ return (this & 0xFF) << 24 >> 24; };
-Number.prototype.shortCut = function(){ return (this & 0xFFFF) << 16 >> 16; };
-Number.prototype.mediumCut = function(){ return (this & 0xFFFFFF) << 8 >> 8; };
-Number.prototype.intCut = function(){ return this & 0xFFFFFFFF; };
 
-Number.prototype.baseString = function(k){
-	if(k.isArray()) return [this].baseString(k);
-	k = parseInt(k);
-	if(k.inRange(2,36))
-		return this.toString(k.round());
-	else{
-		
-		return this.toString(k.fitInRange(2,36));
-	}
-};
 
 
 
@@ -828,7 +1442,7 @@ ex> 10324.768.sfmt(",05.3R36") = "007YS.RNB"
 */
 /*
 Number.prototype.sfmt = function(k){
-	if(k.isArray()) return [this].sfmt(k);
+	if(k.isGeneralArray()) return [this].sfmt(k);
 	k = k.toString();
 	
 	let pos = 0;
@@ -880,50 +1494,919 @@ Number.prototype.sfmt = function(k){
 
 // 패킹
 
-Number.prototype.pack1 = function(){return [this.valueOf()];};
-Number.prototype.pack2 = function(k){return k.isArray() ? [this].pack2(k) : [this.valueOf(), k];};
-Number.prototype.backPack2 = function(k){return k.isArray() ? [this].backPack2(k) : [k, this.valueOf()];};
-Number.prototype.packs = function(...K){return [this.valueOf(), ...K];};
-
-// 역방향 연산
-
-Number.prototype.backAdd = function(k){return k.isArray() ? [this].backAdd(k):parseFloat(+k)+this;};
-Number.prototype.backPadd = function(k){return k.isArray() ? [this].backPadd(k):(parseFloat(+k)+this).precise();};
-Number.prototype.backSub = function(k){return k.isArray() ? [this].backSub(k):k-this;};
-Number.prototype.backPsub = function(k){return k.isArray() ? [this].backPsub(k):(k-this).precise();};
-Number.prototype.backMul = function(k){return k.isArray() ? [this].backMul(k):k*this;};
-Number.prototype.backPmul = function(k){return k.isArray() ? [this].backPmul(k):(k*this).precise();};
-Number.prototype.backDiv = function(k){return k.isArray() ? [this].backDiv(k):k/this;};
-Number.prototype.backPdiv = function(k){return k.isArray() ? [this].backPdiv(k):(k/this).precise();};
-Number.prototype.backDivLim0 = function(k){return k.isArray() ? [this].backDivLim0(k):k==0&&this==0?0:k/this;};
-Number.prototype.backDivLim1 = function(k){return k.isArray() ? [this].backDivLim1(k):k==0&&this==0?1:k/this;};
-Number.prototype.backDivLimInf = function(k){return k.isArray() ? [this].backDivLimInf(k):k==0&&this==0?1/k/this:k/this;};
-Number.prototype.backMod = function(k){return k.isArray() ? [this].backMod(k):k%this;};
-Number.prototype.backIdiv = function(k){return k.isArray() ? [this].backIdiv(k):Math.trunc(k/this);};
-Number.prototype.dmFrom = function(k){return k.isArray() ? [this].dmFrom(k):[k.idiv(this), k.mod(this)];};
-Number.prototype.backPowLim1 = 
-Number.prototype.backPow = function(k){return k.isArray() ? [this].backPow(k):k**this;};
-Number.prototype.backPowLim0 = function(k){return k.isArray() ? [this].backPowLim0(k):k==0&&this==0?0:k**this;};
-Number.prototype.backLogBase = function(k){return k.isArray() ? [this].backLogBase(k) : Math.log(k) / Math.log(this);};
-Number.prototype.backBitwiseLsh = function(k){return k.isArray() ? [this].backBitwiseLsh(k) : k<<this;};
-Number.prototype.backBitwiseRsh = function(k){return k.isArray() ? [this].backBitwiseRsh(k) : k>>this;};
-Number.prototype.backBitwiseUrsh = function(k){return k.isArray() ? [this].backBitwiseUrsh(k) : k>>>this;};
-Number.prototype.backAnd = function(k){return k.isArray() ? [this].backAnd(k) : nullToNA(k.valueOf()&&this.valueOf());};
-Number.prototype.backOr = function(k){return k.isArray() ? [this].backOr(k) : nullToNA(k.valueOf()||this.valueOf());};
-Number.prototype.backXor = function(k){return k.isArray() ? [this].backXor(k) : nullToNA(k.valueOf()&&this.valueOf()?false:k.valueOf()||this.valueOf());};
-Number.prototype.backRoot = function(k){return k.isArray() ? [this].backRoot(k) : Math.abs(this % 2) == 1 ? Math.sign(k) * (Math.abs(k) ** (1/this)) : k ** (1/this);};
 
 
+/*
+
+<< 숫자 반복자 >>
+
+- 양수 상승 카운터 -
+
+0부터 n-1까지 반복한다.
+
+for(let i of 10){
+	console.log(i);
+}; // 0부터 9까지 출력
+
+console.log([...5]); // [0, 1, 2, 3, 4]
 
 
-Number.prototype.for = function(fn){
-	for(let i=0;i<this;i++){
+- 음수 상승 카운터 -
+
+n부터 -1까지 반복한다.
+
+for(let i of -10){
+	console.log(i);
+}; // -10부터 -1까지 출력
+
+console.log([...-5]); // [-5, -4, -3, -2, -1]
+
+** 0을 입력할 경우 빈 값이다. []은 [...0] 과 같다.
+
+
+- 양수 하강 카운터 -
+
+n-1부터 0까지 반복한다. for문 예제는 생락한다.
+
+console.log([...5..down]); // [4, 3, 2, 1, 0]
+
+
+- 음수 하강 카운터 -
+
+-1부터 n까지 반복한다. 주의사항! 리터럴에 음수를 쓸 경우 반드시 괄호를 묶고 괄호뒤 점은 1개를 쓴다.
+
+console.log([...(-5).down]); // [-1, -2, -3, -4, -5]
+
+** 0을 입력할 경우 빈 값이다. []은 [...0..down] 과 같다.
+
+
+- 구간 지정 카운터 -
+
+시점부터 종점-1까지 1씩 증가하여 반복한다.
+0 부터 99까지는 괄호를 생략할 수 있고 음수 또는 100 이상, 리터럴이 아니면 괄호를 필요로 한다.
+
+for(let i of 10.._30){
+	console.log(i);
+} // 10부터 29까지 출력
+
+for(let i of 100.._(1000)){
+	console.log(i);
+} // 100부터 999까지 출력
+
+거꾸로 가는 경우는 -1부터 시작하여 1씩 차감하고 해당 값까지 적용한다.
+
+for(let i of 30.._10){
+	console.log(i);
+} // 29부터 10까지 출력
+
+숫자가 일치하는 경우는 반복을 하지 않는다.
+
+for(let i of 10.._10){
+	console.log(i);
+} // 아무 것도 출력되지 않는다
+
+배열로도 쉽게 수를 표현할 수 있다.
+
+console.log([...10.._20])
+
+리터럴이 아닌 경우는 to를 사용하는 것이 권장됨
+
+for(let i of a.to(b)){
+}
+
+for(let i of a._(b)){
+}
+
+당연히 전자가 가독성이 좋음
+
+       == 중요 주의사항 ==
+★ 증가하는 경우는 도착점을 제외 ★
+★ 감소하는 경우는 출발점을 제외 ★
+
+해당 카운터는 수열 형태의 객체로 생성함으로써 1.._16.sum() = 120 과 같은 연산 수행 가능
+
+
+- 응용 -
+
+문제 : let [a, b, c] = 3; 일 때 a, b, c 의 값은?
+정답 : a=0, b=1, c=2
+해설 : 위의 반복자의 원리에 따른다.
+
+문제 : let [a, [b, c], [d, e]] = 3; 일 때 a, b, c, d, e의 값은?
+정답 : a=0, b=0, c=undefined, d=0, e=1
+해설 : [b, c] = 1, [d, e] = 2를 적용한다.
+
+
+<< 간단 반복자 >>
+
+Python의 List Comprehension 과 비슷한 형식
+PY : [x*10 for x in range(10) if x%3]
+JS : [...$for(10, x=>x*10, x=>x%3)]
+결과 [10, 20, 40, 50, 70, 80]
+
+그럼 2중 List Comprehension은?
+PY : [x*y for x in range(5) for y in range(5) if (x+y)%5 in (2, 4)]
+JS : [...$for([5, 5].multi, ([x,y])=>x*y, ([x,y])=>[2,4].indexOf((x+y)%5)+1)]
+결과 [0, 0, 1, 3, 0, 4, 3, 12, 0, 12]
+
+Multi Iterator는 [0] 이 맨 겉, [length-1] 이 맨 속 루프를 의미한다.
+
+
+<< 멀티 반복자 >>
+
+- 요소가 모두 iterable한 배열에 한하여 가능하다.
+- [0] 은 가장 겉, [N-1] 은 가장 속의 깊이이다.
+- 반환 값은 각각을 하나하나씩 집어 묶은 배열
+
+for(let [i,j] of [[1,4],[2,8]].multi){
+	console.log(`i=${i}, j=${j}`);
+}
+
+i=1, j=2
+i=1, j=8
+i=4, j=2
+i=4, j=8
+
+
+- 주의사항: multi 없이 쓰는 경우
+
+for(let [i,j] of [[1,4],[2,8]]){
+	console.log(`i=${i}, j=${j}`);
+}
+
+i=1, j=4
+i=2, j=8
+
+
+- 위를 융합해서 이런 것도 가능
+
+for(let [i,j,k] of [3,4,2].multi){
+	console.log(`i=${i}, j=${j}, k=${k}`);
+}
+
+for(let [i,j,k] of [3,4,2]){
+	console.log(`i=${i}, j=${j}, k=${k}`);
+}
+
+[... [['딸기','메론'],['바나나','레몬'],['쥬스','에이드']].multi].inner.sadd()
+[... [['딸기','메론'],['바나나','레몬'],['쥬스','에이드']]].inner.sadd()
+[... [['서울','대구','부산'],1.._5,['호선']].multi].inner.sadd()
+
+
+<< 클래스 반복자 >>
+
+Boolean : false, true를 선회
+Number  : 0부터 무제한 선회, [...Number] 사용을 금하며, let [a, b, c] = Number 에 사용됨
+BigInt  : Number와 동일, 다만, BigInt타입임
+
+Boolean.down : true, false를 선회
+Number.down  : -1부터 무제한 음수 선회
+BigInt.down  : Number와 동일, 다만 BigInt 타입임
+
+
+<< 수열 클래스 >>
+
+Numbers     : 등차수열 형태로 계산
+XxxSequence : 구간을 나눠서 계산, 자동 정밀화 포함 (NumPy의 np.xxxspace와 동일)
+Series      : 다항식을 제공하는 수열, 예정
+Python의 Range와는 유사하나 단계에서 음수를 지정할 시 확실한 차이
+
+[...new Numbers(5)] = [0,1,2,3,4]
+[...new Numbers(2,7)] = [2,3,4,5,6]
+[...new Numbers(2,7,-1)] = [6,5,4,3,2] // 음수 스텝이여도 시작과 끝은 양수 범위와 동일하게 적어야 함
+[...new Numbers(2,8,2)] = [2,4,6]  // 처음부터 2칸씩 건너뛰기
+[...new Numbers(2,8,-2)] = [7,5,3] // 끝부터 2칸씩 건너뛰기
+
+[...new LinSequence(1,10)] = [1,2,3,4,5,6,7,8,9,10]       // 1부터 10까지 10등분
+[...new LinSequence(1,5,9)] = [1,1.5,2,2.5,3,3.5,4,4.5,5] // 1부터 5까지 9등분
+[...new LinSequence(10,20,5,false)] = [10,12,14,16,18]    // 끝접 불포함
+
+이 객체는 모두 .slice(), .at(), .length, .map(), .reduce() 등을 쓸 수 있으며,
+.reverse()를 적용 시에는 step이 -1이 곱해지는 것 외에도 시작점 또는 끝점이 달라질 수 있다.
+위와 같이 new Numbers(2,8,2) 와 new Numbers(2,8,-2) 는 반대 방향으로는 서로 다르기에
+이를 처리할 경우 new Numbers(2,7,-2) 로 처리된다.
+반대로 new Numbers(2,8,-2) 의 경우는 new Numbers(3,8,2) 이다.
+.value는 읽기 전용으로 해당 배열을 반환한다. (== .toArray())
+배열과는 달리 ArrayBoundaryError를 발생시키지 않으나 .length는 존재.
+다만, 음수 at을 쓸 경우에는 오른쪽 끝이 아닌 왼쪽 밖으로 계산된다. 오른쪽도 마찬가지.
+예 : new LinSequence(11,20,10).at(-5) = 6
+at, .val에 소수점을 쓸 수 있다.
+에 : new LinSequence(11,20,10).at(1.5) = 12.5
+
+반복문 예제
+{
+	let oddSum = 0;
+	let evenSum = 0;
+	for(let i of new LinSequence(10,50,9)){
+		if(i % 2 == 0) evenSum += i;
+		else oddSum += i;
+	}
+	[oddSum, evenSum];
+}
+
+XxxSequence : ([지수또는함수,] 시점, 종점, 개수, 종점포함여부)
+LinSequence : 선형
+PowSequence : 거듭제곱
+ExpSequence : 지수
+
+
+[예제]
+
+new PowSequence(2, 1, 25, 5)            = [1,4,9,16,25]
+new ExpSequence(1, 16, 5)               = [1,2,4,8,16]
+
+[숫자 내부에서 사용]
+- 개수를 숫자 객체로 지정하고, 앞 글자를 소문자로 한다.
+
+5..linSequence(1, 81)    // new LinSequence(1, 81, 5) 와 동일
+5..expSequence(1, 81)    // new ExpSequence(1, 81, 5) 와 동일
+5..powSequence(2, 1, 81) // new PowSequence(2, 1, 81, 5) 와 동일
+
+
+[Sequence도 Array의 일종]
+- .map, .reduce, .filter 등도 구현이 되어 있어서 대부분 Array의 기능을 이용할 수 있다
+- .slice 의 경우는 현재는 Array로 반환되었으나,
+  추후 시/종점이 조정된 서브시퀀스 반환 예정.
+  개정 전후 상관없이 .value를 쓰면 문제 없음
+- 다만 데이터 설정 메소드의 경우는 특성상 규칙에 따라 저장되어야 한다
+- 시점이 변경되면 종점 제외 나머지 값에 영향을 미치고 종점도 마찬가지 
+- 그 사잇값 변경될 시 해당 비율을 계산해서 시, 종점을 바꾸어 나머지 값에 영향 발생, 현재 값도 오차가 있으나 보정
+- 2개의 값을 동시에 변경할 경우(.set2p(a,b,value)) 해당 점을 통과하는 직(곡)선에 따라서 시점, 종점 y값 재계산
+- 3개 이상을 변경하는 것은 미제공
+- 특성상 .toArray() 로 변환할 수는 있으나 .toSequence() 등으로는 불가
+
+[Sequence를 사용하면 좋은 이점]
+- 메모리 절약
+- 수행속도 향상
+- 단점: 규칙에 따라서 저장됨, 즉 불규칙한 수열은 일반배열 사용
+
+
+*/
+
+Boolean[Symbol.iterator] = function*(){
+	yield false;
+	yield true;
+};
+
+Number[Symbol.iterator] = function*(){
+	let i = -1;
+	while(1)
+		yield ++i;
+};
+
+BigInt[Symbol.iterator] = function*(){
+	let i = -1n;
+	while(1)
+		yield ++i;
+};
+
+Boolean.down = {
+	[Symbol.iterator]:function*(){
+		yield true;
+		yield false;
+	}
+};
+
+Number.down = {
+	[Symbol.iterator]:function*(){
+		let i = 0;
+		while(1)
+			yield --i;
+	}
+};
+
+BigInt.down = {
+	[Symbol.iterator]:function*(){
+		let i = 0n;
+		while(1)
+			yield --i;
+	}
+};
+
+
+
+
+Number.prototype[Symbol.iterator] = function*(){ // 더 간단한 버전, for(let i of 10) 이런식으로... 0부터 현재숫자-1까지 반복
+	let that = this;
+	if(this >= 0){
+		for(let i=0;i<this;i++){
+			yield i;
+		}
+	}else{
+		for(let i=this;i<0;i++){
+			yield i;
+		}
+	}
+};
+
+Number.prototype.__defineGetter__('down', function(){ // 현재숫자-1부터 0까지 반복자 반환
+	return {
+		number: this.valueOf(),
+		[Symbol.iterator]:function*(){
+			let that = this.number;
+			if(this.number >= 0){
+				for(let i=this.number-1;i>=0;i--) yield i;
+			}else{
+				for(let i=-1;i>=this.number;i--) yield i;
+			}
+		},
+	};
+});
+
+
+for(const to of 102){
+	Number.prototype.__defineGetter__('_'+to, function(){
+		const from = this.valueOf();
+		return from < to ? new Numbers(from, to) : new Numbers(to, from, -1);
+	});
+}
+
+Number.prototype.to = 
+Number.prototype._ = function(to){
+	const from = this.valueOf();
+	return from < to ? new Numbers(from, to) : new Numbers(to, from, -1);
+};
+
+function $for(iterated, valueF, condF){
+	if(iterated === undefined) throw new TypeError('피반복자(iterated) 생략 불가');
+	if(valueF === undefined) valueF = identical;
+	if(condF === undefined) condF = x=>true;
+	return {
+		currIt: iterated[Symbol.iterator](),
+		[Symbol.iterator]:function(){
+			let that = this;
+			return{
+				next: () => {
+					let info = that.currIt.next();
+					while(!info.done && !condF(info.value)) info = that.currIt.next();
+					if(info.done) return {done:info.done};
+					return {value:valueF(info.value), done:info.done};
+				}
+			};
+		},
+		valueOf(){return [...this];},
+		get value(){return [...this];},
+		toString(){return `$for(${iterated}, ${valueF}, ${condF})`;},
+	};
+}
+
+
+
+
+Array.prototype.__defineGetter__('multi', function(){
+	let its = this.map(x=>x[Symbol.iterator]());
+	let infos = its.map(x=>x.next());
+	let that = this;
+	
+	return {
+		[Symbol.iterator]:function(){
+			return{
+				next: () => {
+					if(infos[0].done) return {done:true};
+					let ob = {done:false, value:infos.map(x=>x.value)};
+					
+					for(let i of its.length.down){
+						infos[i] = its[i].next();
+						if(infos[i].done){
+							for(let j of i.to(its.length)){
+								if(j) its[j] = that[j][Symbol.iterator]();
+								infos[j] = its[j].next();
+							}
+						}else break;
+					}
+					
+					return ob;
+				},
+			};
+		},
+		valueOf(){return [...this];},
+		get value(){return [...this];},
+		toString(){try{return `${that}.multi`;}catch(e){return e.toString();}},
+	};
+});
+
+class SequenceIndexing{ // 숫자 첨자를 계산하기 위한 조치, .val 떼기
+	constructor(){
+		return this.proxy = new Proxy(this, {
+			get: (object, key) => {
+				if(typeof key !== 'symbol' && !Number.isNaN(Number(key))){
+					return object.at(key);
+				}
+				return Reflect.get(object, key);
+			},
+			has: (object, key) => {
+				if(typeof key !== 'symbol' && !Number.isNaN(Number(key))){
+					return true;
+				}
+				return Reflect.has(object, key);
+			},
+		});
+	}
+};
+
+class AbstractSequence extends SequenceIndexing{ // 아래 같은 부분을 또 다시 쓰는 것을 차단, 상속 적용
+	constructor(){
+		super();
+		if(new.target == AbstractSequence){
+			throw new TypeError('추상 클래스는 생성이 불가합니다.');
+		}
+	};
+	// at, setAt 은 직접 구현하고 그것을 기반으로 실행
+	
+	// 주의!! 일반 slice와는 다른 사용 방법!
+	// a 또는 b가 음수라도 끝에서부터 하는 것이 아닌 왼쪽 밖으로 계산됨
+	// 예시 : [...new Numbers(10, 15)].slice(-2,6) = [13,14] 이지만,
+	// new Numbers(10, 15).slice(-2,6) = [8,9,10,11,12,13,14,15] 이다. .at(-2) ~ at(5) 까지 계산
+	// 배열에서 빌려서 계산 시 0.._(Infinity) 에서는 엄청 오랜시간 소요되며(무제한) 위와 같은 규칙에 따라 별도로 계산함
+	
+	slice(a,b){ 
+		let ar = [];
+		for(let i of a.to(b)){
+			ar.push(this.at(i));
+		}
+		return ar;
+	};
+	forEach(fn){
+		for(let i of this.length){
+			fn(this.at(i), i, this);
+		}
+	};
+	map(fn){
+		let ar = [];
+		for(let i of this.length){
+			ar.push(fn(this.at(i), i, this));
+		}
+		return ar;
+	};
+	reduce(fn, init){
+		if(init===undefined){
+			if(this.length <= 0) return NA;
+			let y = this.at(0);
+			for(let i of 1.._(this.length)){
+				y = fn(y, this.at(i), i, this);
+			}
+			return y;
+		}
+		let y = init;
+		for(let i of this.length){
+			y = fn(y, this.at(i), i, this);
+		}
+		return y;
+	};
+	reduceRight(fn, init){
+		if(init===undefined){
+			if(this.length <= 0) return NA;
+			let y = this.at(this.length-1);
+			for(let i of (this.length-1).down){
+				y = fn(y, this.at(i), i, this);
+			}
+			return y;
+		}
+		let y = init;
+		for(let i of this.length.down){
+			y = fn(y, this.at(i), i, this);
+		}
+		return y;
+	};
+	filter(fn){
+		let ar = [], tv;
+		for(let i of this.length){
+			tv = this.at(i);
+			if(fn(tv)) ar.push(tv);
+		}
+		return ar;
+	};
+	some(fn){
+		let ar = [];
+		for(let i of this.length){
+			if(fn(this.at(i))) return true;
+		}
+		return false;
+	};
+	every(fn){
+		let ar = [];
+		for(let i of this.length){
+			if(!fn(this.at(i))) return false;
+		}
+		return true;
+	};
+	*[Symbol.iterator](){
+		for(let i of this.length) yield this.at(i); 
+	};
+	valueOf(){ // 일반 배열로 반환
+		return [...this];
+	};
+	toString(){ // Sequence 타입은 시작점과 끝점만 표시
+		return this.at(0) + '~' + this.at(this.length-1)
+	};
+	toStringEx(){
+		return '['+this.at(0) + '~' + this.at(this.length-1)+']';
+	};
+	toArray(){
+		return [...this];
+	};
+	toFloat64Array(){
+		return new Float64Array([...this]);
+	};
+	isArray(){ // 수열도 배열로 취급
+		return true;
+	};
+	isSequence(){
+		return true;
+	};
+	get value(){ // 읽기전용
+		return [...this];
+	};
+	
+	// << 통계 메소드 >>
+	// 수열의 이점을 살리기 위해 등차수열의 합 공식 등에 의해 내부 알고리즘이 변경될 수 있음
+	// 기본적으로는 일일이 계산한다.
+	
+	sum(){ return this.add(); }
+	mean(){return this.sum() / this.length;};
+	var(){
+		let mean = this.mean();
+		return this.reduce((a,b)=>a + (b-mean)*(b-mean),0).div(this.length);
+	};
+	stdev(){
+		let mean = this.mean();
+		return this.reduce((a,b)=>a + (b-mean)*(b-mean),0).div(this.length).sqrt();
+	};
+	sumprod(other){
+		return other === undefined ? this.mul().sum() : this.mul(other).sum();
+	};
+	N(){
+		return this.length;
+	};
+	max(){
+		return this.greatest();
+	};
+	min(){
+		return this.least();
+	};
+	pick(indices){
+		let that = this.proxy;
+		if(indices.isArray()){
+			return indices.map(x=>that[x]);
+		}
+		return that[indices];
+	};
+};
+
+Object.makeCalculable(AbstractSequence);
+
+class Numbers extends AbstractSequence{ // 인덱스용 숫자 생성
+	constructor(start, end, step){
+		super();
+		if(end === undefined){
+			this.start = 0;
+			this.end = start;
+			this.step = 1;
+			return;
+		};
+		this.start = start ?? 0;
+		this.end = end ?? 0;
+		this.step = step ?? 1;
+		if(this.step == 0) throw new RangeError('간격(step)은 0이 될 수 없음');
+	};
+	at(idx){
+		if(Number.isInteger(this.step))
+			return (this.step > 0 ? this.start + idx * this.step : this.end - 1 + idx * this.step);
+		return (this.step > 0 ? this.start + idx * this.step : this.end - 1 + idx * this.step).precise();
+	};
+	get length(){
+		if(this.step > 0)
+			return ((this.end - this.start)/this.step).precise().ceil();
+		else
+			return ((this.end-1 - this.start)/-this.step + 1).precise().floor();
+	};
+	comb(factor){ // Array의 comb와는 조금 다른 방식을 적용함 (실수일 때 적용)
+		return new Numbers(this.start, this.end, this.step * factor);
+	};
+	reverse(){
+		return new Numbers(this.start, (this.at(this.length-1)+1).precise(), -this.step);
+	};
+	reverseCopy(){
+		return this.reverse();
+	};
+	toLinSequence(){ // LinSequence로 변환, 기본 폐구간 취급
+		return new LinSequence(this.at(0), this.at(this.length-1), this.length);
+	};
+	
+	// 빠른 계산을 위한 특별 규칙 적용
+	add(other){
+		return this.toLinSequence().add(other);
+	};
+	aug(other){
+		return this.toLinSequence().aug(other);
+	};
+	sub(other){
+		return this.toLinSequence().sub(other);
+	};
+	mul(other){
+		return this.toLinSequence().mul(other);
+	};
+	div(other){
+		return this.toLinSequence().div(other);
+	};
+	pow(other){
+		return this.toLinSequence().pow(other);
+	};
+	powBase(other){
+		return this.toLinSequence().powBase(other);
+	};
+	
+	
+};
+
+class ConSequence extends AbstractSequence{ // 상수 수열, 숫자 외에도 다양한 값을 넣을 수 있음
+	constructor(key, n){
+		super();
+		this.key = key;
+		this.n = n;
+	};
+	at(idx){
+		return this.key;
+	};
+	get length(){
+		return this.n;
+	};
+};
+
+Number.prototype.conSequence = function(key){
+	return new ConSequence(key, this);
+};
+
+class AbstractSpacedSequence extends AbstractSequence{ // 시점, 종점, 개수 그리고 시종점포함여부를 포함하는 공간형 수열, 기본적으로 시종점을 모두 포함한다.
+	constructor(start, end, n, endpoint){
+		super();
+		this.start = start ?? 1;
+		this.end = end ?? 100;
+		this.n = Math.round(n ?? 100);
+		if(this.n < 0) throw new RangeError('n<0 (n은 0이거나 양수)');
+		this.endpoint = endpoint ?? '[]';
+		if({'[]':-1, '(]':0, '[)':0, '()':+1}[this.endpoint] === undefined) throw new RangeError('잘못된 구간 기호');
+		if(this.n == 1 && this.endpoint == '[]'){ // 강제조정, 0으로 나누기 방지용, n이 0이면 비어있으므로 상관없음
+			this.endpoint = '[)'; // ex. new LinSequence(10,20,1,'[]') -> new LinSequence(10,20,1,'[)') :: [10]
+		}
+	};
+	getAlpha(idx){
+		return ((this.endpoint[0] == '(') + Number(idx))/this.nden;
+	};
+	inum(idx){
+		return ((this.endpoint[0] == '(') + Number(idx));
+	};
+	get length(){
+		return this.n;
+	};
+	get nden(){
+		return this.n + {'[]':-1, '(]':0, '[)':0, '()':+1}[this.endpoint];
+	};
+	
+};
+
+class LinSequence extends AbstractSpacedSequence{ // 선형 수열
+	constructor(start, end, n, endpoint){
+		super(start, end, n, endpoint);
+	};
+	at(idx){
+		return this.start.frAlphaAdd(this.end, this.inum(idx), this.nden).precise();
+	};
+	reverse(){
+		return new LinSequence(this.end, this.start, this.n, {'[]':'[]','(]':'[)','[)':'(]','()':'()'}[this.endpoint]);
+	};
+	reverseCopy(){
+		return new LinSequence(this.end, this.start, this.n, {'[]':'[]','(]':'[)','[)':'(]','()':'()'}[this.endpoint]);
+	};
+	
+	// 계산 속도를 빠르게 하고 부정확한 값 방지를 위해 등차수열의 성질, 합의 공식에 따라 계산
+	
+	add(other){
+		if(other === undefined){
+			return this.at(0).center(this.at(this.n-1)) * this.n; // 등차수열의 합 공식 (매우 큰 숫자에 강점) 
+		}
+		if(other instanceof Numbers) other = other.toLinSequence();
+		if(other instanceof LinSequence){ // LinSequence
+			if(this.n != other.n) throw new SizeMismatchError(`${this.length} vs ${other.length} 크기가 다릅니다. `);
+			if(this.endpoint == other.endpoint) // 끝점 구간이 동일하면 그냥 계산하면 됨
+				return new LinSequence(this.start + other.start, this.end + other.end, this.n, this.endpoint);
+			return new LinSequence(this.at(0) + other.at(0), this.at(this.n-1) + other.at(other.n-1), this.n, '[]'); // 강제로 끝점 조정하여 계산
+		}
+		if(other instanceof ConSequence){ // 상수수열
+			return new LinSequence(this.start + other.key, this.end + other.key, this.n, this.endpoint);
+		}
+		if(other.isNumber()){ // 스칼라
+			return new LinSequence(this.start + other, this.end + other, this.n, this.endpoint);
+		}
+		return Array.prototype.add.call(this, other); // 그렇지 않을 시 일반 배열 수준 덧셈 실행
+	};
+	sub(other){
+		if(other === undefined){ // 뺄샘하는 경우는 주의해야 함, 첫 항은 무조건 빼지는 수로 합에서 제외해야 함
+			return this.at(0) - this.at(1).center(this.at(this.n-1)) * (this.n-1);
+		};
+		if(other instanceof Numbers) other = other.toLinSequence();
+		if(other instanceof LinSequence){ // LinSequence
+			if(this.n != other.n) throw new SizeMismatchError(`${this.length} vs ${other.length} 크기가 다릅니다. `);
+			if(this.endpoint == other.endpoint) // 끝점 구간이 동일하면 그냥 계산하면 됨
+				return new LinSequence(this.start - other.start, this.end - other.end, this.n, this.endpoint);
+			return new LinSequence(this.at(0) - other.at(0), this.at(this.n-1) - other.at(other.n-1), this.n, '[]'); // 강제로 끝점 조정하여 계산
+		}
+		if(other instanceof ConSequence){ // 상수수열
+			return new LinSequence(this.start - other.key, this.end - other.key, this.n, this.endpoint);
+		}
+		if(other.isNumber()){ // 스칼라
+			return new LinSequence(this.start - other, this.end - other, this.n, this.endpoint);
+		}
+		return Array.prototype.sub.call(this, other); // 그렇지 않을 시 일반 배열 수준 덧셈 실행
+	};
+	mul(other){
+		if(other === undefined){
+			return Array.prototype.mul.call(this); // 등차수열의 곱의 공식은 감마, 펙토리얼 등이 있긴 하지만... 
+		}
+		// 등차수열과 등차수열 또는 다른수열 곱해도 절대 등차수열은 불가능함. 다만 상수수열은 가능함
+		if(other instanceof ConSequence){
+			return new LinSequence(this.start * other.key, this.end * other.key, this.n, this.endpoint);
+		}
+		if(other.isNumber()){ // 스칼라 곱도 유효함
+			return new LinSequence(this.start * other, this.end * other, this.n, this.endpoint);
+		}
+		return Array.prototype.mul.call(this, other);
+	};
+	div(other){
+		if(other === undefined){
+			return Array.prototype.div.call(this); // 나눗셈도 마찬가지 
+		}
+		// 등차수열과 등차수열 또는 다른수열 나눠도 절대 등차수열은 불가능함. 다만 상수수열은 가능함
+		if(other instanceof ConSequence){
+			return new LinSequence(this.start / other.key, this.end / other.key, this.n, this.endpoint);
+		}
+		if(other.isNumber()){ // 스칼라 나눗셈도 유효함
+			return new LinSequence(this.start / other, this.end / other, this.n, this.endpoint);
+		}
+		return Array.prototype.div.call(this, other);
+	}; // 숫자에서 등차수열로 나누는 행위는 조화수열으로 PowSequence로 계산 가능, 추후 예정
+	pow(other){
+		if(other === undefined){
+			return Array.prototype.pow.call(this);
+		}
+		if(other instanceof ConSequence){ // 등차수열의 거듭제곱수열은 이미 구현되어 있음
+			return new PowSequence(other.key, this.start ** other.key, this.end ** other.key, this.n, this.endpoint);
+		}
+		if(other.isNumber()){
+			return new PowSequence(other, this.start ** other, this.end ** other, this.n, this.endpoint);
+		}
+		
+		return Array.prototype.pow.call(this, other);
+	};
+	powBase(other){
+		if(other === undefined){
+			return Array.prototype.powBase.call(this);
+		}
+		if(other instanceof ConSequence){ // 상수의 거듭제곱은 곧 등비수열
+			return new ExpSequence(other.key ** this.start, other.key ** this.end, this.n, this.endpoint);
+		}
+		if(other.isNumber()){
+			return new ExpSequence(other ** this.start, other ** this.end, this.n, this.endpoint);
+		}
+		
+		return Array.prototype.powBase.call(this, other);
+	};
+	
+};
+
+LinSequence.prototype.aug = LinSequence.prototype.add; // add 별칭, aug :: Set에 add가 이미 있어 충돌방지를 위해 aug 사용 권장하나, 호환상 add도 있어야 함
+
+
+Number.prototype.linSequence = function(start, end, endpoint){
+	return new LinSequence(start, end, this, endpoint);
+};
+
+class PowSequence extends AbstractSpacedSequence{ // 거듭제곱 수열
+	constructor(p, start, end, n, endpoint){
+		super(start, end, n, endpoint);
+		this.p = p ?? 2; // 기본 제곱으로 간주
+	};
+	get startr(){
+		return this.start.root(this.p);
+	};
+	get endr(){
+		return this.end.root(this.p);
+	};
+	at(idx){
+		return (this.startr.frAlphaAdd(this.endr, this.inum(idx), this.nden) ** this.p).precise();
+	};
+	reverse(){
+		return new PowSequence(this.p, this.end, this.start, this.n, {'[]':'[]','(]':'[)','[)':'(]','()':'()'}[this.endpoint]);
+	};
+	reverseCopy(){
+		return new PowSequence(this.p, this.end, this.start, this.n, {'[]':'[]','(]':'[)','[)':'(]','()':'()'}[this.endpoint]);
+	};
+};
+
+Number.prototype.powSequence = function(p, start, end, endpoint){
+	return new PowSequence(p, start, end, this, endpoint);
+};
+
+class ExpSequence extends AbstractSpacedSequence{ // 지수 수열
+	constructor(start, end, n, endpoint){
+		super(start, end, n, endpoint);
+	};
+	get startl(){
+		return Math.log(Math.abs(this.start));
+	};
+	get endl(){
+		return Math.log(Math.abs(this.end));
+	};
+	at(idx){
+		return Math.sign(this.start) * this.startl.frAlphaAdd(this.endl, this.inum(idx), this.nden).exp().precise();
+	};
+	reverse(){
+		return new ExpSequence(this.end, this.start, this.n, {'[]':'[]','(]':'[)','[)':'(]','()':'()'}[this.endpoint]);
+	};
+	reverseCopy(){
+		return new ExpSequence(this.end, this.start, this.n, {'[]':'[]','(]':'[)','[)':'(]','()':'()'}[this.endpoint]);
+	};
+	add(other){
+		if(other === undefined){ // 등비수열의 합 공식
+			if(this.end == this.start) return this.start * this.n; // 공비기 1인 경우
+			
+			if(this.n > 200){ // 부정확하다는 이유로 200개 초과 시 공식 사용
+				let R = this.at(this.n) / this.at(0);
+				let r = this.at(1) / this.at(0);
+				
+				return (this.at(0) * (1 - R) / (1 - r)).precise(); // 등비수열의 합 공식 (매우 큰 숫자에 강점)
+			}			
+		}
+		return Array.prototype.add.call(this, other); // 그렇지 않을 시 일반 배열 수준 덧셈 실행
+	};
+	sub(other){
+		if(other === undefined){ // 등비수열의 합 공식
+			if(this.end == this.start) return this.start * (2 - this.n); // 공비기 1인 경우
+			
+			if(this.n > 200){
+				let R = this.at(this.n-1) / this.at(0);
+				let r = this.at(1) / this.at(0);
+				
+				return (this.at(0) - this.at(1) * (1 - R) / (1 - r)).precise(); // 등비수열의 합 공식 (매우 큰 숫자에 강점) 
+			}
+		}
+		return Array.prototype.sub.call(this, other); // 그렇지 않을 시 일반 배열 수준 덧셈 실행
+	};
+	mul(other){
+		if(other === undefined){
+			return (this.start < 0 && this.n % 2 == 1 ? -1 : 1) * (this.at(0) * this.at(this.n-1)) ** (this.n/2); // 등비수열의 곱 공식 (매우 큰 숫자에 강점) 
+		}
+		if(other instanceof ExpSequence){ // ExpSequence
+			if(this.n != other.n) throw new SizeMismatchError(`${this.length} vs ${other.length} 크기가 다릅니다. `);
+			if(this.endpoint == other.endpoint) // 끝점 구간이 동일하면 그냥 계산하면 됨
+				return new ExpSequence(this.start * other.start, this.end * other.end, this.n, this.endpoint);
+			return new ExpSequence(this.at(0) * other.at(0), this.at(this.n-1) * other.at(other.n-1), this.n, '[]'); // 강제로 끝점 조정하여 계산
+		}
+		if(other instanceof ConSequence){ // 상수수열
+			return new ExpSequence(this.start * other.key, this.end * other.key, this.n, this.endpoint);
+		}
+		if(other.isNumber()){ // 스칼라
+			return new ExpSequence(this.start * other, this.end * other, this.n, this.endpoint);
+		}
+		return Array.prototype.mul.call(this, other); // 그렇지 않을 시 일반 배열 수준 덧셈 실행
+	};
+	div(other){
+		if(other === undefined){
+			return (this.start < 0 && this.n % 2 == 0 ? -1 : 1) * this.at(0) / ((this.at(1) * this.at(this.n-1)) ** ((this.n - 1)/2)); // 등비수열의 곱 공식 (매우 큰 숫자에 강점) 
+		}
+		if(other instanceof ExpSequence){ // ExpSequence
+			if(this.n != other.n) throw new SizeMismatchError(`${this.length} vs ${other.length} 크기가 다릅니다. `);
+			if(this.endpoint == other.endpoint) // 끝점 구간이 동일하면 그냥 계산하면 됨
+				return new ExpSequence(this.start / other.start, this.end / other.end, this.n, this.endpoint);
+			return new ExpSequence(this.at(0) / other.at(0), this.at(this.n-1) / other.at(other.n-1), this.n, '[]'); // 강제로 끝점 조정하여 계산
+		}
+		if(other instanceof ConSequence){ // 상수수열
+			return new ExpSequence(this.start / other.key, this.end / other.key, this.n, this.endpoint);
+		}
+		if(other.isNumber()){ // 스칼라
+			return new ExpSequence(this.start / other, this.end / other, this.n, this.endpoint);
+		}
+		return Array.prototype.div.call(this, other); // 그렇지 않을 시 일반 배열 수준 덧셈 실행
+	};
+	
+	
+};
+
+PowSequence.prototype.aug = PowSequence.prototype.add;
+
+Number.prototype.expSequence = function(start, end, endpoint){
+	return new ExpSequence(start, end, this, endpoint);
+};
+
+
+Number.prototype.for = function(fn, dropHead){
+	for(let i=dropHead??0;i<this;i++){
 		fn(i);
 	}
 };
 
-Number.prototype.forDown = function(fn){
-	for(let i=this-1;i>=0;i--){
+Number.prototype.forDown = function(fn, dropHead){
+	for(let i=this-1-(dropHead??0);i>=0;i--){
 		fn(i);
 	}
 };
@@ -982,163 +2465,6 @@ Number.prototype.forProdBase1 = function(fn){ // 곱하기 (서수 - 펙토리�
 	return sum;
 };
 
-Number.prototype.isOdd = 
-Number.prototype.isOddNumber = function(){
-	return Math.abs(this) % 2 == 1;
-};
-
-Number.prototype.isEven = 
-Number.prototype.isEvenNumber = function(){
-	return this % 2 == 0;
-};
-
-Number.prototype.isPrime = 
-Number.prototype.isPrimeNumber = function(){ // 소수 여부
-	if(this <= 1 || this > 1e8 || this % 1) return false; // 너무 큰 수 적용 불가(랙 방지), 정수가 아니거나 1은 소수로 취급 안함
-	for(let i=2;i*i<=this;i++){
-		if(this % i == 0) return false;
-	}
-	return true;
-};
-
-Number.prototype.divisors = function(){ // 약수
-	let array1 = [1];
-	let array2 = [+this];
-	
-	if(this < 1 || this > 1e8 || this % 1) return Array.NaA; // 너무 큰 수 적용 불가(랙 방지), 정수가 아닌 경우 등등은 NaA 반환
-	
-	if(this == 1) return [1];
-	
-	for(let i=2;i*i<=this;i++){
-		if(this % i == 0){
-			array1.push(i);
-			if(i*i!=this)
-				array2.push(this/i);
-		}
-	}
-	
-	return array1.concat(array2.reverse());
-};
-
-Number.prototype.isPositive = function(){
-	return this > 0;
-};
-
-Number.prototype.isNegative = function(){
-	return this < 0;
-};
-
-Number.prototype.isZero = function(){
-	return this == 0;
-};
-
-Number.prototype.isNaN = function(){
-	return isNaN(this);
-};
-
-Number.prototype.isFinite = function(){
-	return isFinite(this);
-};
-
-
-Number.prototype.normal = function(m1, s1, m2, s2){return (this-m1)/s1*(s2??1)+(m2??0);};
-
-Number.prototype.gcd = function(b){ // 최대공약수
-	let a=this, t;
-	
-	while(b){
-		t = a % b;
-		a = b;
-		b = t;
-	}
-	return Math.abs(a);
-};
-
-Number.prototype.lcm = function(b){ // 최소공배수
-	return Math.abs(this / this.gcd(b) * b);
-};
-
-Number.prototype.coprime = function(b){ // 서로소 여부
-	return this.gcd(b) == 1;
-};
-
-Number.prototype.ratio = function(lim){
-	if(!lim) lim = 2**16;
-	var fi = [];
-	var m, k;
-	var An = 0, Ad = 1, Bn = 1, Bd = 0, Mn, Md, i, kf;
-	
-	var x = this;
-	var sg = Math.sign(x);
-	if(sg < 0) x = -x;
-
-	for (i = 0; i < 32; i++) {
-
-		// k factor 사용
-		Mn = An + Bn;
-		Md = Ad + Bd;
-		m = Mn / Md;
-		k = (An - Ad*x) / (Bd*x - Bn);
-		if (x < m) { // Left
-			k = (Bd*x - Bn) / (An - Ad*x);
-			kf = Math.floor(k);
-			if (Ad && kf > Math.trunc((lim - Bd) / Ad)) {
-				kf = Math.trunc((lim - Bd) / Ad);
-
-				Bn = kf*An + Bn;
-				Bd = kf*Ad + Bd;
-
-				break;
-			}else if(kf < 0) break;
-
-			Bn = kf*An + Bn;
-			Bd = kf*Ad + Bd;
-
-			if (Bn / Bd == x) {
-				fi = [sg < 0 ? -Bn : Bn, Bd];
-				return fi;
-			}
-		}
-		else if (x > m) { // Right
-			kf = Math.floor(k);
-			if (Bd && kf > Math.trunc((lim - Ad) / Bd)) {
-				kf = Math.trunc((lim - Ad) / Bd);
-
-				An = An + kf*Bn;
-				Ad = Ad + kf*Bd;
-
-				break;
-			}else if(kf < 0) break;
-
-			An = An + kf*Bn;
-			Ad = Ad + kf*Bd;
-
-			if (An / Ad == x) {
-				fi = [sg < 0 ? -An : An, Ad];
-				return fi;
-			}
-		}
-		else {
-			fi = [sg < 0 ? -Mn : Mn, Md];
-			return fi;
-		}
-
-	}
-	
-	if (Math.abs(x - An / Ad) >= Math.abs(x - Bn / Bd))
-		fi = [Bn, Bd];
-	else
-		fi = [An, Ad];
-		
-	if(sg < 0) fi[0] *= -1;
-
-	return fi;
-};
-
-Number.prototype.asFraction = function(b){ // 서로소 여부
-	return this.ratio(1000000);
-};
-
 Number.prototype.describe = function(k){
 	let dic = {};
 	if(k != undefined){
@@ -1158,54 +2484,36 @@ Number.prototype.describe = function(k){
 };
 
 // 항등원 정리 (연산 a@b에 대해 I@a@b = a@b가 성립하는 하나의 I, 존재 안하면 NaN 반환)
+Object.identities = 
 Number.identities = {
+	'aug': 0,
 	'add': 0,
-	'backAdd': 0,
 	'sub': NaN,
-	'backSub': NaN,
 	'mul': 1,
-	'backMul': 1,
 	'div': NaN,
-	'backDiv': NaN,
 	// 사칙 연산
 	'padd': 0,
-	'backPadd': 0,
 	'psub': NaN,
-	'backPsub': NaN,
 	'pmul': 1,
-	'backPmul': 1,
 	'pdiv': NaN,
-	'backPdiv': NaN,
 	// 정밀 보정 사칙 연산
 	'divLim0': NaN,
 	'divLim1': NaN,
 	'divLimInf': NaN,
-	'backDivLim0': NaN,
-	'backDivLim1': NaN,
-	'backDivLimInf': NaN,
 	// 
 	'idiv': NaN,
-	'backIdiv': NaN,
 	'mod': NaN,
-	'backMod': NaN,
 	'dm': [1, NaN],
 	'pow': NaN,
-	'backPow': NaN,
 	'powLim0': NaN,
-	'backPowLim0': NaN,
 	'powLim1': NaN,
-	'backPowLim1': NaN,
 	'logBase': NaN,
-	'backLogBase': NaN,
 	'bitwiseAnd': -1,
 	'bitwiseOr': 0,
 	'bitwiseXor': 0,
 	'bitwiseLsh': NaN,
-	'backBitwiseLsh': NaN,
 	'bitwiseRsh': NaN,
-	'backBitwiseRsh': NaN,
 	'bitwiseUrsh': NaN,
-	'backBitwiseUrsh': NaN,
 	'lcm': NaN,
 	'gcd': 0,
 	'least': Infinity,
@@ -1216,7 +2524,6 @@ Number.identities = {
 	'atan2': NaN,
 	'hypot': 0,
 	'root': NaN,
-	'backRoot': NaN,
 	'fractionRound': NaN,
 	'fractionCeil': NaN,
 	'fractionFloor': NaN,
@@ -1230,23 +2537,15 @@ Number.identities = {
 	'digitFloor': NaN,
 	'digitTrunc': NaN,
 	'sadd': '',
-	'backSadd': '',
 	'ssub': 'N/A',
-	'backSsub': 'N/A',
 	'smul': 'N/A',
-	'backSmul': 'N/A',
 	'sdiv': ['N/A'],
-	'backSdiv': ['N/A'],
 	'pack2': NA,
-	'backPack2': NA,
 	'toXY': [NaN, NaN],
 	'toPolar': [NaN, NaN],
 	'and': true,
 	'or': false,
 	'xor': false,
-	'backAnd': true,
-	'backOr': false,
-	'backXor': false,
 	'less': true, // 비교 연산자들은 and를 사용하기 때문에 and 항등원인 true 적용, 다만 CI는 애매해서 NaN 적용
 	'leq': true,
 	'greater': true,
@@ -1254,31 +2553,6 @@ Number.identities = {
 	'equal': true,
 	'notEqual': true,
 };
-
-
-// 타입 체크
-Number.prototype.isBoolean = function(){return false;};
-Number.prototype.isNumber = function(){return true;};
-Number.prototype.isString = function(){return false;};
-Number.prototype.isArray = function(){return false;};
-Number.prototype.isNA = function(){return false;};
-Number.prototype.toStringEx = Number.prototype.toString;
-Number.prototype.count = function(){return 1;};
-Number.prototype.validCount = function(){return 1;};
-Number.prototype.strLen = function(){return this.toString().length;};
-
-for(let operator of ARRAY_OPERATORS){
-	Number.prototype[operator] = function(...K){return [this][operator](...K);};
-};
-
-for(let operator of ALL_OPERATORS){
-	if(!Boolean.prototype[operator])
-		Boolean.prototype[operator] = Number.prototype[operator];
-	if(!String.prototype[operator])
-		String.prototype[operator] = Number.prototype[operator];
-}
-
-String.prototype.strLen = function(){return this.length;};
 
 String.prototype.knife = function(...indices){ // "hello world".knife(2,-2) = ["he", "llo wor", "ld"]
 	let that = this;
@@ -1302,19 +2576,7 @@ Number.prototype.if = function(runOnTrue, runOnFalse){
 	}
 };
 
-Boolean.prototype.concat = Number.prototype.sadd;
-Boolean.prototype.repeat = Number.prototype.smul;
-
-Boolean.prototype.isBoolean = function(){return true;};
-Boolean.prototype.isNumber = function(){return false;};
-Boolean.prototype.isString = function(){return false;};
-Boolean.prototype.isArray = function(){return false;};
-Boolean.prototype.isNA = function(){return false;};
-Boolean.prototype.toStringEx = Boolean.prototype.toString;
-
-String.prototype.splus = function(){return this.valueOf();};
-String.prototype.reverse = 
-String.prototype.sminus = function () {
+String.prototype.reverse = function () {
   let str = this;
   const length = this.length;
   let temp;
@@ -1328,7 +2590,6 @@ String.prototype.sminus = function () {
   }
   return str;
 };
-String.prototype.sreciproc = function(){return this.split('');};
 
 /*
 [문자열 연산 규정]
@@ -1350,82 +2611,9 @@ String.prototype.sreciproc = function(){return this.split('');};
 
 
 */
-String.prototype.add = function(k){return parseFloat(this)+parseFloat(k);};
-String.prototype.repeatEx = function(k){let [i, f] = parseFloat(+k).abs().modf(); f = Math.round(f * this.length); return k>=0?this.repeat(i).concat(this.substr(0,f)) : this.substr(this.length-f).concat(this.repeat(i)).reverse();};
 
-String.prototype.backAdd = function(k){return parseFloat(k)+parseFloat(this);};
-String.prototype.concatFrom = function(...K){return K.reverseCopy().join('').concat(this);};
-String.prototype.repeatFrom = function(k){return k.toString().repeat(this);};
-
-String.prototype.isBoolean = function(){return false;};
-String.prototype.isNumber = function(){return false;};
-String.prototype.isString = function(){return true;};
-String.prototype.isArray = function(){return false;};
-String.prototype.isNA = function(){return false;};
 String.prototype.toStringEx = function(){return "'"+this+"'"};
 
-String.prototype.sadd = function(k){return k.isArray() ? [this].sadd(k):this.concat(k);}; // 문자열 덧셈, 결합
-String.prototype.backSadd = function(k){return k.isArray() ? [this].backSadd(k):this.concatFrom(k);};
-String.prototype.ssub = function(k){return k.isArray() ? [this].ssub(k):this.replaceAll(k,'');}; // 문자열 뺄셈, 모두 제거
-String.prototype.backSsub = function(k){return k.isArray() ? [this].backSsub(k):k.toString().replaceAll(this,'');}; // 문자열 뺄셈 역방향
-String.prototype.smul = function(k){return k.isArray() ? [this].smul(k):this.repeatEx(k);}; // 문자열 곱셈, 반복
-String.prototype.backSmul = function(k){return k.isArray() ? [this].backSmul(k):k.toString().repeatEx(this);};; // 문자열 곱셈, 반복
-String.prototype.sdiv = function(k){
-	if(k.isArray()) return [this].sdiv(k);
-	if(k.isNumber()){
-		let arr = [];
-		if(k > 0){ // 양수는 앞에서부터
-			for(let i=0;i<this.length;i+=k){
-				arr.push(this.slice(i,i+k));
-			}
-		}else if(k < 0){ // 음수는 뒤에서부터
-			for(let i=0;i>-this.length;i+=k){
-				arr.push(this.slice(i+k,i?i:Infinity));
-			}
-			arr.reverse();
-		}else{ // 0으로 나누는 것은 NaA 반환
-			return Array.NaA;
-		}
-		
-		return arr;
-	}
-	return this.split(k);
-}; // 문자열 나눗셈, 분할
-String.prototype.backSdiv = function(k){return k.isArray() ? [this].backSdiv(k):k.toString().sdiv(this);};
-String.prototype.smod = function(k){return k.isArray() ? [this].smod(k):k>=0?this.slice(0,k):this.slice(k);}; // 문자열 나머지 연산, 앞 또는 뒤 K개 남김
-String.prototype.backSmod = function(k){return k.isArray() ? [this].backSmod(k):this>=0?k.toString().slice(0,this):k.toString().slice(k);};
-String.prototype.slsh = function(k){return k.isArray() ? [this].slsh(k):this.slice(k).concat(this.slice(0,k));}; // 문자열 나머지 연산, 앞 또는 뒤 K개 남김
-String.prototype.backSlsh = function(k){return k.isArray() ? [this].backSlsh(k):k.toString().slice(this).concat(k.toString().slice(0,this));}; // 'abracadabra'
-String.prototype.srsh = function(k){return k.isArray() ? [this].srsh(k):this.slice(-k).concat(this.slice(0,-k));}; // 문자열 나머지 연산, 앞 또는 뒤 K개 남김
-String.prototype.backSrsh = function(k){return k.isArray() ? [this].backSrsh(k):k.toString().slice(-this).concat(k.toString().slice(0,-this));}; // 'abracadabra'
-
-// 진법 변환, 16진법 및 10진법 한정 소수점 처리 가능
-String.prototype.hexToNumber = function(){
-	let index = this.indexOf('.'); // 소수점 위치 찾기
-	let value = parseInt(this, 16);
-	
-	if(index == -1) return value; // 소수점 없으면 그대로 반환
-	
-	let minus = value < 0 || this.trim().charAt(0) == '-';
-	
-	index++; // 점 뒤로 이동
-	let weight = 1/16, digit;
-	for(;!isNaN(digit = parseInt(this.charAt(index),16));index++){
-		value += minus ? -weight*digit : weight*digit;
-		weight /= 16;
-	}
-	return value;
-};
-String.prototype.octToNumber = function(){ return parseInt(this, 8); };
-String.prototype.binToNumber = function(){ return parseInt(this, 2); };
-String.prototype.decToNumber = function(){ return parseFloat(this); };
-
-String.prototype.similarObject = function(k){
-	return this == k || this.toLowerCase() == k.toString().toLowerCase();
-};
-String.prototype.similar = function(k){
-	return k.isArray() ? [this].similar(k) : this.toLowerCase() == k.toString().toLowerCase();
-};
 
 String.prototype.nextCharCode = function(k){
 	if(k == undefined) k = 1;
@@ -1523,12 +2711,6 @@ const NaA = Array.NaA;
 Array.prototype.isValidArray = function(){
 	return !this.NaA;
 };
-
-Array.prototype.isBoolean = function(){return false;};
-Array.prototype.isNumber = function(){return false;};
-Array.prototype.isString = function(){return false;};
-Array.prototype.isArray = function(){return true;};
-Array.prototype.isNA = function(){return false;};
 
 // 안정적인 계산을 위하여 null 또는 undefined는 모두 NA로 변환
 Array.prototype.nullToNA = function(){return this.map(nullToNA);};
@@ -1651,13 +2833,15 @@ Array.prototype.copy = function(){ // 복사본 (1차원만 깊은 복사됨)
 	return [...this];
 };
 Array.prototype.superCopy = function(){ // 슈퍼카피, 내부 속까지 깊은 복사함 (완전한 깊은 복사)
-	return this.map(x=>x.isArray()?x.superCopy():x);
+	return this.map(x=>x.isGeneralArray()?x.superCopy():x.isTypedArray()?x.copy():x);
 };
 
 Array.prototype.paste = function(other){ // 내 배열로 붙여넣기
 	let that = this;
 	this.length = other.length;
-	this.length.for(function(i){that[i] = other[i].isArray() ? other[i].superCopy() : other[i];});
+	this.length.for(function(i){
+		that[i] = other[i].isGeneralArray() ? other[i].superCopy() : other[i].isTypedArray()?other[i].copy():other[i]; // 수열은 상수이기 때문
+	});
 	return this;
 };
 Array.prototype.pasteTo = function(other){ // 다른 배열에게 내 배열을 붙여넣기
@@ -1931,7 +3115,7 @@ L = 0         R = -1
 
 Array.prototype.lookup = function(what){
 	let that = this;
-	if(what.isArray()) return what.map(x=>that.lookup(x));
+	if(what.isGeneralArray()) return what.map(x=>that.lookup(x));
 	let left = 0, right = this.length-1, center;
 	while(left <= right){
 		center = left.center(right).floor();
@@ -1952,7 +3136,7 @@ Array.prototype.lookup = function(what){
 
 Array.prototype.insertApply = function(what){
 	let that = this;
-	if(what.isArray()){
+	if(what.isGeneralArray()){
 		what.forEach(x=>that.insertApply(x));
 		return this;
 	}
@@ -1971,6 +3155,8 @@ Array.prototype.insert = function(what){
 
 // 행렬 관련 메소드
 
+Array.prototype.toArray = function(){return this;};
+
 Array.prototype.aplus = Array.prototype.superCopy;
 Array.prototype.aplusApply = function(){return this;};
 
@@ -1986,9 +3172,9 @@ Array.prototype.aminusApply = Array.prototype.reverse;
 Array.prototype.transpose = 
 Array.prototype.T = function(){
 	let that = this;
-	let mincol = Math.min(...this.map(x=>x.isArray()?x.length:that.length));
+	let mincol = Math.min(...this.map(x=>x.isGeneralArray()?x.length:that.length));
 	
-	return new Array(mincol).fill(0).map((x,i)=>that.map(y=>y.isArray()?y[i]:y));
+	return new Array(mincol).fill(0).map((x,i)=>that.map(y=>y.isGeneralArray()?y[i]:y));
 };
 
 // 집계 함수
@@ -2033,7 +3219,7 @@ cf. [10,20].pack2([30,40]) = [[10,30],[20,40]]
 // 배열 연산자
 Array.prototype.aadd = Array.prototype.concat; // [10,20] a+ [30,5] = [10,20,30,5]
 Array.prototype.aaddApply = function(other){
-	if(other.isArray())
+	if(other.isGeneralArray())
 		this.push(...other);
 	else
 		this.push(other);
@@ -2042,7 +3228,7 @@ Array.prototype.aaddApply = function(other){
 
 Array.prototype.aaddLeft = Array.prototype.concat; // [10,20] a+ [30,5] = [10,20,30,5]
 Array.prototype.aaddLeftApply = function(other){
-	if(other.isArray())
+	if(other.isGeneralArray())
 		this.unshift(...other);
 	else
 		this.unshift(other);
@@ -2062,9 +3248,9 @@ Array.prototype.setDifference =
 Array.prototype.asub = function(other, equalOp){
 	equalOp ??= 'equal';
 	equalOp += 'Object';
-	if(!other.isArray()) other = [other];
+	if(!other.isGeneralArray()) other = [other];
 	let eqTable = this.matrix(equalOp, other);
-	let rows = eqTable.innerOr();
+	let rows = eqTable.inner.or();
 	//let cols = eqTable.or();
 	
 	return this.mask(rows.not());
@@ -2074,9 +3260,9 @@ Array.prototype.intersection =
 Array.prototype.aand = function(other, equalOp){
 	equalOp ??= 'equal';
 	equalOp += 'Object';
-	if(!other.isArray()) other = [other];
+	if(!other.isGeneralArray()) other = [other];
 	let eqTable = this.matrix(equalOp, other);
-	let rows = eqTable.innerOr();
+	let rows = eqTable.inner.or();
 	//let cols = eqTable.or();
 	
 	return this.mask(rows);
@@ -2086,9 +3272,9 @@ Array.prototype.union =
 Array.prototype.aor = function(other, equalOp){
 	equalOp ??= 'equal';
 	equalOp += 'Object';
-	if(!other.isArray()) other = [other];
+	if(!other.isGeneralArray()) other = [other];
 	let eqTable = this.matrix(equalOp, other);
-	//let rows = eqTable.innerOr();
+	//let rows = eqTable.inner.or();
 	let cols = eqTable.or();
 	
 	return this.aadd(other.mask(cols.not()));
@@ -2098,9 +3284,9 @@ Array.prototype.symmetricDifference =
 Array.prototype.axor = function(other, equalOp){
 	equalOp ??= 'equal';
 	equalOp += 'Object';
-	if(!other.isArray()) other = [other];
+	if(!other.isGeneralArray()) other = [other];
 	let eqTable = this.matrix(equalOp, other);
-	let rows = eqTable.innerOr();
+	let rows = eqTable.inner.or();
 	let cols = eqTable.or();
 	
 	return this.mask(rows.not()).aadd(other.mask(cols.not()));
@@ -2186,7 +3372,7 @@ Array.prototype.sumprod = function(other){
 
 Array.prototype.covar = function(other){
 	other ??= this;
-	return this.sub(this.mean()).sumprod(other.sub(other.mean())).div(this.cardinality());
+	return this.sub(this.mean()).sumprod(other.sub(other.mean())).div(this.N());
 };
 
 
@@ -2199,7 +3385,7 @@ if(this.NaA) return Array.NaA;
 	if(other.NaA) return Array.NaA;
 	
 	let that = this;
-	if(other.isArray()){
+	if(other.isGeneralArray()){
 		if(this.length != other.length){
 			// 어느 한 쪽 길이가 1이면, Broadcasting
 			if(this.length == 1) return other.map((a,i)=>that[0][operator](a)); //Broadcasting 
@@ -2246,23 +3432,23 @@ Array.prototype.mask = function(logical){
 	let result = [];
 	let that = this;
 	
-	if(logical.isArray()){
+	if(logical.isGeneralArray()){
 		if(this.length != logical.length && this.length != 1 && logical.length != 1){
 			// Broadcasting 불가 조건 
 			return Array.NaA;
 		}
 		let tlen = this.length, llen = logical.length, len = tlen.greatest(llen);
 		len.for(function(i){
-			if(that[i % tlen].isArray()){
-				if(logical[i % llen].isArray()) // 둘 다 배열이면 추가하되 재귀한 결과를 삽입
-					result.push(that[i % tlen].mask(logical[i % llen]));
+			if(that.at(i % tlen).isGeneralArray()){
+				if(logical.at(i % llen).isGeneralArray()) // 둘 다 배열이면 추가하되 재귀한 결과를 삽입
+					result.push(that.at(i % tlen).mask(logical.at(i % llen)));
 				// 논리값이 스칼라이면 그 여부에 따라 추가 (통째 처리)
-				else if(logical[i % llen].boolean())
-					result.push(that[i % tlen]);
-			}else if(logical[i % llen].isArray()){ // 원본 값이 스칼라면 괄호를 씌워 생각
-				result.push([that[i % tlen]].mask(logical[i % llen]));
-			}else if(logical[i % llen].boolean()){ // 모두 스칼라
-				result.push(that[i % tlen]);
+				else if(logical.at(i % llen).boolean())
+					result.push(that.at(i % tlen));
+			}else if(logical.at(i % llen).isGeneralArray()){ // 원본 값이 스칼라면 괄호를 씌워 생각
+				result.push([that.at(i % tlen)].mask(logical.at(i % llen)));
+			}else if(logical.at(i % llen).boolean()){ // 모두 스칼라
+				result.push(that.at(i % tlen));
 			}
 		});
 		return result;
@@ -2289,44 +3475,44 @@ Array.prototype.innerCount = function(){
 	return this.map(x=>x.count()); // * 모든 객체에 count 속성 삽입, string 객체는 length와 달리 1을 반환
 };
 Array.prototype.superCount = function(){
-	return this.reduce((x,y)=>y.isArray()?x+y.superCount():x+1,0);
+	return this.reduce((x,y)=>y.isGeneralArray()?x+y.superCount():x+1,0);
 };
 
 Array.prototype.isExistNA = function(){
-	return this.some(x=>x.isNA());
+	return this.some(x=>x===undefined||x.isNA());
 };
 Array.prototype.naCount = function(){
-	return this.filter(x=>x.isNA()).length;
+	return this.filter(x=>x===undefined||x.isNA()).length;
 };
 Array.prototype.validCount = function(){ // 유효한 개수
-	return this.filter(x=>!x.isNA()).length;
+	return this.filter(x=>x!==undefined&&!x.isNA()).length;
 };
 Array.prototype.checkValidElement = function(){ // 2차원 이상인 경우 사용, [[1,4],[2,8],[NA,7],6] 의 경우 [3,4] 가 적용됨 [1,2,NA,6]=>3, [[1],[2],[NA],[6]]=>[3]
-	return this.map(x=>x.isArray()?x.checkValidElement():!x.isNA());
+	return this.map(x=>x.isGeneralArray()?x.checkValidElement():!x.isNA());
 }; // [[1,4],[2,8],[NA,7],6].checkValidElement() = [[true,true],[true,true],[false,true],true]
-Array.prototype.cardinality = function(){ // 평균 등의 계산을 위해서 각 가지별로 개수를 구함, Broadcasting Rule 규정 적용
+Array.prototype.N = function(){ // 평균 등의 계산을 위해서 각 가지별로 개수를 구함, Broadcasting Rule 규정 적용
 	return this.checkValidElement().sum();
 };
 //[[1,1],[1,1],[0,1],1].addReduce();
 Array.prototype.naRate = function(){
-	return this.filter(x=>x.isNA()).length / this.length;
+	return this.filter(x=>x===undefined||x.isNA()).length / this.length;
 };
 Array.prototype.dropNA = function(){
-	return this.filter(x=>!x.isNA());
+	return this.filter(x=>x!==undefined && !x.isNA());
 };
 Array.prototype.dropNAApply = function(){
 	return this.paste(this.dropNA());
 };
 Array.prototype.dropEmpty = function(){
-	return this.filter(x=>!x.isNA() && (!x.isArray() || x.length));
+	return this.filter(x=>x!==undefined && !x.isNA() && (!x.isArray() || x.length));
 };
 Array.prototype.dropEmptyApply = function(){
 	return this.paste(this.dropEmpty());
 };
 Array.prototype.fillNA = function(k){
 	if(typeof k == 'function')
-		return this.map((x,i,A)=>x.isNA()?k(i,A):x);
-	return this.map(x=>x.isNA()?k:x);
+		return this.map((x,i,A)=>x===undefined||x.isNA()?k(i,A):x);
+	return this.map(x=>x===undefined||x.isNA()?k:x);
 };
 
 
@@ -2354,16 +3540,26 @@ Array.prototype.fillNA = function(k){
 
 // 배열 연산
 
-Array.prototype._unaryOp = function(operator){
+Array.prototype.unary = function(operator, isSafe){
 	if(this.NaA) return Array.NaA;
 	
-	return this.map(a=>a[operator]());
+	if(isSafe) 
+		return this.map(a=>Gfunc.safeCall(a, operator));
+	return this.map(a=>Gfunc.call(a, operator));
 };
 
-Array.prototype._unaryAp = function(operator){
+Array.prototype.unaryAp = function(operator){
 	if(this.NaA) return this;
-	
-	this.forEach((a,i,A)=>A[i]=a[operator+(a.isArray()?'Apply':'')]());
+	let that = this;
+	try{
+		this.forEach((a,i,A)=>{
+			try{
+				that[i]=a[operator+(a.isGeneralArray()?'Apply':'')]()
+			}catch(e){
+				that[i]=e;
+			}
+		});
+	}catch(e){return e;}
 	return this;
 };
 
@@ -2379,9 +3575,9 @@ Array.prototype.opReduce = function(operator, isRight){
 			case 'compare':
 			return NaN;
 			default:
-			return this[0];
+			return this.at(0);
 		}
-		case 2: return isRight ? this[1][operator](this[0]) : this[0][operator](this[1]);
+		case 2: return isRight ? this.at(1)[operator](this.at(0)) : this.at(0)[operator](this.at(1));
 		default:
 		// 10>5>3>1 정상은 true, JS식 계산 10>5=true, 1>3=false, 0>1=false -> false
 		// less, leq, greater, geq, equal, notEqual 연산자는 수학적 규칙에 따라 그전의 항에 따라서 판별함
@@ -2409,15 +3605,14 @@ Array.prototype.opReduce = function(operator, isRight){
 		// [3,3,3].compare() =  0
 		// [3,2,2].compare() =  0.5
 		// [3,2,1].compare() =  1
-		
 		switch(CONTINUOUSELY_COMPARE[operator] || operator){
 			case true:
-			if(isRight) return this.reduceRight((a,b,i,A)=>(i==A.length-2?true:a).and(A[i+1][operator](b)));
-			return this.reduce((a,b,i,A)=>(i==1?true:a).and(A[i-1][operator](b)));
+			if(isRight) return this.reduceRight((a,b,i,A)=>(i==A.length-2?true:a).and(A.at(i+1)[operator](b)));
+			return this.reduce((a,b,i,A)=>(i==1?true:a).and(A.at(i-1)[operator](b)));
 			
 			case 'compare':
-			if(isRight) return this.reduceRight((a,b,i,A)=>(i==A.length-2?1.5:a)._citrans(A[i+1][operator](b)));
-			return this.reduce((a,b,i,A)=>(i==1?1.5:a)._citrans(A[i-1][operator](b)));
+			if(isRight) return this.reduceRight((a,b,i,A)=>(i==A.length-2?1.5:a)._citrans(A.at(i+1)[operator](b)));
+			return this.reduce((a,b,i,A)=>(i==1?1.5:a)._citrans(A.at(i-1)[operator](b)));
 			
 			default:
 			return this[isRight?'reduceRight':'reduce']((a,b)=>a[operator](b));
@@ -2426,24 +3621,26 @@ Array.prototype.opReduce = function(operator, isRight){
 	}
 }
 
-Array.prototype._binaryOp = function(operator, other){
+Array.prototype.binary = function(operator, other){
+	
 	if(other === undefined){ // 지정하지 않은 경우 리듀싱으로 계산함
-		return this.opReduce(operator, false);
+		return Array.prototype.opReduce.call(this,operator, false);
 	}
 	
 	if(this.NaA) return Array.NaA;
 	if(other.NaA) return Array.NaA;
 	
 	let that = this;
+	
 	if(other.isArray()){
 		if(this.length != other.length){
 			// 어느 한 쪽 길이가 1이면, Broadcasting
-			if(this.length == 1) return other.map((a,i)=>that[0][operator](a)); //Broadcasting 
-			if(other.length == 1) return this.map((a,i)=>a[operator](other[0])); //Broadcasting 
+			if(this.length == 1) return other.map((a,i)=>that.at(0)[operator](a)); //Broadcasting 
+			if(other.length == 1) return this.map((a,i)=>a[operator](other.at(0))); //Broadcasting 
 			// 아니면 에러 처리함
-			throw new BroadcastingError(this.length+' vs '+other.length+' (only allow 1vsN, Nvs1, NvsN), Evaluate All Cases : '+operator+'Cartesian(y) etc.');
+			throw new SizeMismatchError(this.length+' vs '+other.length+' (크기가 맞지 않습니다. 단, 1개는 예외적으로 브로드캐스팅 룰에 따라 허용됩니다.)');
 		}
-		return this.map((a,i)=>a[operator](other[i]));
+		return this.map((a,i)=>a[operator](other.at(i)));
 	}
 	return this.map(a=>a[operator](other));
 };
@@ -2457,32 +3654,32 @@ Array.prototype._binaryOp = function(operator, other){
 [[1,2,3]].add([4,5]) = [[1,2,3]+4,[1,2,3]+5] = [[1+4,2+4,3+4],[1+5,2+5,3+5]] = [[5,6,7],[6,7,8]]
 */
 
-Array.prototype._binaryCar = function(operator, other){
+Array.prototype.binaryCar = function(operator, other){
 	if(this.NaA) return Array.NaA;
 	if(other.NaA) return Array.NaA;
 	
 	let that = this;
 	
-	if(other.isArray()){
+	if(other.isGeneralArray()){
 		let res = new Array(this.length * other.length);
-		this.forEach((a,i)=>other.forEach((b,j)=> res[i*other.length+j] = this[i][operator+(a.isArray()?'Cartesian':'')](other[j])));
+		this.forEach((a,i)=>other.forEach((b,j)=> res[i*other.length+j] = this[i][operator+(a.isGeneralArray()?'Cartesian':'')](other[j])));
 		return res;
 	}
-	return this.map(a=>a[operator+(a.isArray()?'Cartesian':'')](other));
+	return this.map(a=>a[operator+(a.isGeneralArray()?'Cartesian':'')](other));
 };
 
-Array.prototype._binaryLeftCar = function(operator, other){
+Array.prototype.binaryLeftCar = function(operator, other){
 	if(this.NaA) return Array.NaA;
 	if(other.NaA) return Array.NaA;
 	
 	let that = this;
 	
-	if(other.isArray()){
+	if(other.isGeneralArray()){
 		let res = new Array(this.length * other.length);
-		other.forEach((a,i)=>this.forEach((b,j)=> res[i*this.length+j] = this[j][operator+(a.isArray()?'LeftCartesian':'')](other[i])));
+		other.forEach((a,i)=>this.forEach((b,j)=> res[i*this.length+j] = this[j][operator+(a.isGeneralArray()?'LeftCartesian':'')](other[i])));
 		return res;
 	}
-	return this.map(a=>a[operator+(a.isArray()?'LeftCartesian':'')](other));
+	return this.map(a=>a[operator+(a.isGeneralArray()?'LeftCartesian':'')](other));
 };
 
 
@@ -2494,13 +3691,13 @@ a.addApply([3,[1,2],4,[-2,-3]]); // [[9,[15]],[6,8],[15,17],[7,6]]
 a.toStringEx();
 */
 
-Array.prototype._binaryAp = function(operator, other){ // 복합대입 (addApply 등)
+Array.prototype.binaryAp = function(operator, other){ // 복합대입 (addApply 등)
 	if(this.NaA) return this;
 	if(other.NaA) return this;
 	
 	
 	let that = this;
-	if(other.isArray()){
+	if(other.isGeneralArray()){
 		if(this.length != other.length){
 			// 어느 한 쪽 길이가 1이면, Broadcasting
 			if(this.length == 1){
@@ -2508,7 +3705,7 @@ Array.prototype._binaryAp = function(operator, other){ // 복합대입 (addApply
 				return this;
 			}
 			if(other.length == 1){
-				this.forEach((a,i,A)=>A[i]=a[operator+(a.isArray()?'Apply':'')](other[0])); //Broadcasting 
+				this.forEach((a,i,A)=>that[i]=a[operator+(a.isGeneralArray()?'Apply':'')](other[0])); //Broadcasting 
 				return this;
 			}
 			// 아니면 NaA 반환
@@ -2516,14 +3713,14 @@ Array.prototype._binaryAp = function(operator, other){ // 복합대입 (addApply
 			this.length = 0; // 전부 삭제
 			return this;
 		}
-		this.forEach((a,i,A)=>A[i]=a[operator+(a.isArray()?'Apply':'')](other[i]));
+		this.forEach((a,i,A)=>that[i]=a[operator+(a.isGeneralArray()?'Apply':'')](other[i]));
 		return this;
 	}
-	this.forEach((a,i,A)=>A[i]=a[operator+(a.isArray()?'Apply':'')](other));
+	this.forEach((a,i,A)=>that[i]=a[operator+(a.isGeneralArray()?'Apply':'')](other));
 	return this;
 };
 
-Array.prototype._ternaryOp = function(operator, other, ...args){ // 3항 이상은 2항까지 배열 허용
+Array.prototype.ternary = function(operator, other, ...args){ // 3항 이상은 2항까지 배열 허용
 	
 	if(this.NaA) return Array.NaA;
 	
@@ -2532,13 +3729,13 @@ Array.prototype._ternaryOp = function(operator, other, ...args){ // 3항 이상�
 		if(other.NaA) return Array.NaA;
 		
 		let that = this;
-		if(other.isArray()){
+		if(other.isGeneralArray()){
 			if(this.length != other.length){
 				// 어느 한 쪽 길이가 1이면, Broadcasting
 				if(this.length == 1) return other.map((a,i)=>that[0][operator](a, ...args)); //Broadcasting 
 				if(other.length == 1) return this.map((a,i)=>a[operator](other[0], ...args)); //Broadcasting 
 				// 아니면 에러 처리함
-				throw new BroadcastingError(this.length+' vs '+other.length+' (only allow 1vsN, Nvs1, NvsN), Evaluate All Cases : '+operator+'Cartesian(y) etc.');
+				throw new SizeMismatchError(this.length+' vs '+other.length+' (only allow 1vsN, Nvs1, NvsN), Evaluate All Cases : '+operator+'Cartesian(y) etc.');
 			}
 			return this.map((a,i)=>a[operator](other[i], ...args));
 		}
@@ -2547,53 +3744,17 @@ Array.prototype._ternaryOp = function(operator, other, ...args){ // 3항 이상�
 	
 };
 
-Array.prototype._ternaryAp = function(operator, ...args){
+Array.prototype.ternaryAp = function(operator, ...args){
 	if(this.NaA) return this;
 	
-	this.forEach((a,i,A)=>A[i]=a[operator+(a.isArray()?'Apply':'')](...args));
+	this.forEach((a,i,A)=>A[i]=a[operator+(a.isGeneralArray()?'Apply':'')](...args));
 	return this;
 };
 
+AbstractSequence.prototype.unary = Array.prototype.unary;
+AbstractSequence.prototype.binary = Array.prototype.binary;
+AbstractSequence.prototype.ternary = Array.prototype.ternary;
 
-for(let operator of UNARY_OPERATORS){
-	if(Array.prototype[operator] == undefined){
-		Array.prototype[operator] = function(){
-			return this._unaryOp(operator);
-		};
-		Array.prototype[operator+'Apply'] = function(){
-			return this._unaryAp(operator);
-		};
-		
-	}
-}
-
-for(let operator of BINARY_OPERATORS){
-	if(Array.prototype[operator] == undefined){
-		Array.prototype[operator] = function(other){
-			return this._binaryOp(operator, other);
-		};
-		Array.prototype[operator+'Apply'] = function(other){
-			return this._binaryAp(operator, other);
-		};
-		Array.prototype[operator+'Cartesian'] = function(other){
-			return this._binaryCar(operator, other);
-		};
-		Array.prototype[operator+'LeftCartesian'] = function(other){
-			return this._binaryLeftCar(operator, other);
-		};
-	}
-}
-
-for(let operator of TERNARY_OPERATORS){
-	if(Array.prototype[operator] == undefined){
-		Array.prototype[operator] = function(...args){
-			return this._ternaryOp(operator, ...args);
-		};
-		Array.prototype[operator+'Apply'] = function(...args){
-			return this._ternaryAp(operator, ...args);
-		};
-	}
-}
 
 // 한 요소 간의 해당 여부 연산
 //
@@ -2632,18 +3793,17 @@ for(let operator of TERNARY_OPERATORS){
 // 해당 여부를 모두 보려면 개발자 모드에서 a.describe(~~) 를 통하여 조회 가능
 // NA를 포함해서 계산되므로 주의! 필요 시 dropNA 를 먼저 실행 권장
 //
-//  
-
-for(let operator of UNARY_CHECK_OPERATORS){
-	Array.prototype[operator.addCamelPrefix('some')] = function(){
+//  *** 수정 필요 구간 ***
+	/*
+	Array.prototype.someE = function(operator){
 		let res = this[operator]();
 		return res.NaA ? false : res.someBoolean();
 	};
-	Array.prototype[operator.addCamelPrefix('every')] = function(){
+	Array.prototype.oevery = function(operator){
 		let res = this[operator]();
 		return res.NaA ? false : res.everyBoolean();
 	};
-	Array.prototype[operator.addCamelPrefix('rate')] = function(){
+	Array.prototype.orate = function(){
 		let res = this[operator]();
 		return res.NaA ? NaN : res.truthyRate();
 	};
@@ -2666,8 +3826,6 @@ for(let operator of UNARY_CHECK_OPERATORS){
 	
 	
 	
-}
-
 for(let operator of BINARY_COMPARE_OPERATORS){
 	
 	Array.prototype[operator.addCamelPrefix('some')] = function(other){
@@ -2716,14 +3874,6 @@ for(let operator of TERNARY_COMPARE_OPERATORS){
 		let res = this[operator](...args);
 		return res.NaA ? NaN : res.truthyRate();
 	};
-	Array.prototype[operator.addCamelPrefix('half')] = function(...args){
-		let res = this[operator](...args);
-		return res.NaA ? false : res.truthyRate() >= 0.5;
-	};
-	Array.prototype[operator.addCamelPrefix('overHalf')] = function(...args){
-		let res = this[operator](...args);
-		return res.NaA ? false : res.truthyRate() > 0.5;
-	};
 	Array.prototype[operator.addCamelPrefix('count')] = function(...args){
 		let res = this[operator](...args);
 		return res.NaA ? NaN : res.truthyCount();
@@ -2743,7 +3893,7 @@ for(let operator of TERNARY_COMPARE_OPERATORS){
 	
 }
 
-
+*/
 
 // 범위 내 데이터값 존재 여부
 
@@ -2814,7 +3964,7 @@ Array.prototype._singleIndexing = function(indices_array){
 };
 Array.prototype._fancyIndexing = function(indices_array){
 	let that = this;
-	return indices_array.map(x=>x.isArray()?that._singleIndexing(x):that[x]);
+	return indices_array.map(x=>x.isGeneralArray()?that._singleIndexing(x):that[x]);
 };
 Array.prototype.sliceEx = function(start_indices, end_indices){
 	if(start_indices.length != end_indices.length){
@@ -2834,6 +3984,9 @@ Array.prototype.sliceEx = function(start_indices, end_indices){
 };
 */
 
+Array.prototype.setAt = function(idx, value){
+	return this[idx] = value;
+};
 
 Array.prototype.pick = function(idx, ...cdr){
 	let that = this;
@@ -2866,13 +4019,13 @@ Array.prototype.pick = function(idx, ...cdr){
 		return this.at(depth); 
 	}
 	
-	if(depth.isArray()){ // .pick([~]) -> .pick(0, [~])
+	if(depth.isGeneralArray()){ // .pick([~]) -> .pick(0, [~])
 		indices = [depth, ...indices];
 		depth = 0;
 	}
 	
 	if(depth >= 1)
-		return this.map(x=>x.isArray()?x.pick(depth-1, ...indices));
+		return this.map(x=>x.isGeneralArray()?x.pick(depth-1, ...indices));
 	
 	if(indices[0] !== undefined){ // Range Indexing
 		return this._rangeIndexing(depth, indices[0]);
@@ -2929,7 +4082,8 @@ a.superReduce('sub')   <=> A = a; for _ in a.shape: A = np.subtract.reduce(A)
 /*
  inner 메소드, 깊이를 정하고, 연산할 메소드 (또는 람다식), 그리고 파라미터를 지정함
  깊이에 따라서 연산 방법이 달라짐
- 두 배열간의 요소간 연산은 innerBinary 을 사용
+ 두 배열간의 요소간 연산은 innerBinary 을 사용 (예정)
+ 앞에 @를 붙일 시 해당 속성 반환
  
  [예제]
  a = [[10,20,25],[37,60,28]];
@@ -2943,36 +4097,161 @@ a.superReduce('sub')   <=> A = a; for _ in a.shape: A = np.subtract.reduce(A)
  
 */
 
-Array.prototype.inner = function(depth, operator, ...params){
+Array.prototype._inner = function(depth, operator, ...params){
 	depth ??= 1;
 	
 	if(depth >= 2)
-		return this.map(a=>(a.isArray()?a:[a]).inner(depth-1, operator, ...params));
+		return this.map(a=>(a.isArray()?a:[a])._inner(depth-1, operator, ...params));
 	
-	if(typeof operator == 'function'){ // Lambda
-		if(depth >= 1)
-			return this.map(a=>operator(a, ...params));
-		return operator(this, ...params);
-	} // Method
+	if(depth >= 1){
+		return this.map(a=>Gfunc.call(a, operator, ...params));
+	}
 	
+	/*
 	if(depth >= 1)
-		return this.map(a=>a[operator](...params));
-	return this[operator](...params);
+		return this.map(a=>Gfunc.call(a, operator, ...params));
+	*/
+	
+	if(params.length == 0) // Unary Operator
+		return this.isArray() ? Gfunc.call(this, operator, ...params) : this;
+	
+	// Binary or Over Binary
+	return Gfunc.call(this, operator, ...params);
 };
 
+
+/*
+
+inner와 broadcast
+
+inner(d)  : 단순 해당 함수 내부 1회성 실행, d를 붙여 깊이 지정후 함수로 표현
+broadcast : .result 전까지 계속 브로드캐스팅
+
+예 :
+a = [[10,20,30],[40,50,60,80],[62,75,83,12],[80,90,100]];
+a.inner.add() = [60,230,232,270]
+a.broadcast.add() = #[60,230,232,270]             << 현재 브로드캐스팅 중임을 표시
+a.broadcast.add().result = [60,230,232,270]       << 브로드캐스팅 중단
+a.broadcast.add().result.mul() = 864432000        << 브로드캐스팅 후의 뒷처리
+
+broadcast의 경우는 속성을 처리하므로 $aaa() 를 쓰지 않음
+inner의 경우는 함수 기반으로 $aaa() 사용 
+
+아래는 모두 동일한 결과를 반환함
+
+a = [[10,20,30],[40,50,60,80],[62,75,83,12],[80,90,100]];
+a.right(2).broadcast.mid(1,-1).value.result.toStringEx(); // 시점(broadcast)과 종점(result) 를 명시
+a.right(2).inner.mid(1,-1).inner.$value().toStringEx();   // 계속해서 inner를 써야 함
+
+TypedArray 는 broadcast 미지원 (1차원이므로)
+TypedTensor는 broadcast 대신에 axis를 사용
+
+이중 이상의 브로드캐스팅... 일괄 종료는 result 1번만 사용
+
+a = [[[2, 1, 6],
+      [0, 5, 5],
+      [8, 3, 0]],
+
+     [[8, 2, 1],
+      [1, 6, 9],
+      [6, 0, 8]],
+
+     [[4, 8, 8],
+      [7, 5, 8],
+      [0, 0, 9]]];
+
+
+a.broadcast.broadcast.mean().result                      // 2차 내부의 평균 계산
+a.broadcast.broadcast.max().resd1.min().result = [6,5,8] // 2차 내부의 최댓값 계산 후 1차 내부의 최솟값 계산
+
+resd2  -> 2차 내부 방송 종료
+resd1  -> 1차 내부 방송 종료
+resd0  ->     외부 방송 종료
+result ->     전체 방송 종료
+
+a.left(2).value.broadcast.right(2).value.broadcast.mid(1,-1).value.result.toStringEx();
+[[[5],[3]],[[6],[0]]]
+
+*/
+
+function stopBroadcastInner(r){
+	return r.map(x=>x.onair ? x.result : x);
+}
+
+let ArrayBroadcastHandler = {
+	get:function(broadcaster, key){
+		if(key == 'onair') return true;
+		// 중첩 방송 처리
+		if(key == 'result') return broadcaster.target.map(x=>x.onair ? x.result : x); // 전체 방송 종료
+		// 내부 방송 종료
+		if(key == 'resd0') return broadcaster.target;
+		if(key.startsWith('resd') && !isNaN(key.slice(4))){
+			return new Proxy({target:broadcaster.target.map(x=>x.onair ? x['resd'+(key.slice(4)-1)] : x), onair:true}, ArrayBroadcastHandler);
+		}
+		if(key == 'toStringEx') return ()=>'#'+broadcaster.target.toStringEx();
+		
+		// 함수는 각 함수로 실행, 첫 번째 인자 가지고 판단
+		if(broadcaster.target.length && typeof broadcaster.target[0][key] == 'function'){
+			return function(...args){
+				return new Proxy({target:broadcaster.target.map(x=>x[key](...args)), onair:true}, ArrayBroadcastHandler);
+			};
+		}
+		// 속성은 각 속성으로 실행
+		return new Proxy({target:broadcaster.target.map(x=>x[key]), onair:true}, ArrayBroadcastHandler);
+		
+	},
+	set:function(broadcaster, key, value){ // 값 설정은 더 이상의 방송이 필요 없다
+		broadcaster.target.forEach((x,i)=>broadcaster.target[i][key] = value);
+		return true;
+	},
+	/*
+	get : function (target, operator){
+		//if(operator == 'value') return target.object.value;
+		
+		return function(...args){
+			return target.object.map(x=>x[operator](...args));
+		};
+		//return target.object.map(x=>x[operator](...args));
+	}
+	*/
+};
+
+
+Array.prototype.__defineGetter__('broadcast', function(){
+	return new Proxy({target:this, onair:true}, ArrayBroadcastHandler);
+});
+
+let SimpleArrayBroadcastHandler = {
+	get:function(broadcaster, key){
+		return function(...args){
+			return broadcaster.target._inner(broadcaster.depth, key, ...args);
+		};
+	},
+	set:function(broadcaster, key, value){
+		return true;
+	},
+};
+
+Array.prototype.innerd = function(depth){
+	return new Proxy({target:this, depth:depth}, SimpleArrayBroadcastHandler);
+};
+
+Array.prototype.__defineGetter__('inner', function(){
+	return new Proxy({target:this, depth:1}, SimpleArrayBroadcastHandler);
+});
 
 
 /*
 if(this.length == 0) return Number.identities[operator];
-		if(this[0].isArray())
-			return this.slice(1)[isRight?'reduceRight':'reduce']((a,b)=>b.isArray()?
+		if(this[0].isGeneralArray())
+			return this.slice(1)[isRight?'reduceRight':'reduce']((a,b)=>b.isGeneralArray()?
 				a[operator](b[superOperator](isRight)) : a[operator](b), this[0][superOperator](isRight));
-		return this[isRight?'reduceRight':'reduce']((a,b)=>b.isArray()?
+		return this[isRight?'reduceRight':'reduce']((a,b)=>b.isGeneralArray()?
 			a[operator](b[superOperator](isRight)) : a[operator](b));
 */
 //[50,[30,[20, 10]],70].superReduce('mean') = [50,[30,15],70] -> [50,22.5,70] -> 47.5
 Array.prototype.superReduce = function(operator, isRight){
-	return this.map(x=>x.isArray() ? x.superReduce(operator,isRight) : x)[operator+(isRight?'RTL':'')](); // 해당 함수에 이미 항등원 처리 반영
+	return this.map(x=>x.isGeneralArray() ? x.superReduce(operator,isRight) : x)[operator+(isRight?'RTL':'')](); // 해당 함수에 이미 항등원 처리 반영
 };
 
 // comb // 빝 형태 추출
@@ -3040,7 +4319,7 @@ Array.prototype.near = function(operator, stride, size, isRotate){
 	size ??= 2;
 	isRotate ??= false;
 	
-	if(size == 2 && NNARY_OPERATORS[operator] == 2){
+	if(size == 2 && Object.operations[operator].length == 2){
 		let that = this;
 		if(isRotate){
 			if(stride >= 0)
@@ -3087,7 +4366,7 @@ Array.prototype.near = function(operator, stride, size, isRotate){
 // [1,4,2,8].accum('sub',RTL) = [8-2-4-1,8-2-4,8-2,8] = [1,2,6,8]
 
 Array.prototype.accum = function(operator, isRight){
-	let cum = this[isRight ? this.length-1 : 0];
+	let cum = this.at(isRight ? this.length-1 : 0);
 	if(isRight)
 		return this.reverseCopy().map((a,i,A)=>(cum = i ? cum[operator](a) : cum)).reverse();
 	return this.map((a,i,A)=>(cum = i ? cum[operator](a) : cum));
@@ -3109,46 +4388,52 @@ Array.prototype.matrix = function(operator, other){
 		return this.map((a,i,A)=>A.map((b,j)=>a[operator](b)));
 };
 
-for(let operator of BINARY_OPERATORS){
-	Array.prototype[operator+'RTL'] = function(){ // [10, 5, 7].subReduce() = 10-5-7=-2, [10, 5, 7].subReduce(true) = 10-(5-7) = 12
-		if(this.NaA || !this.length) return Number.identities[operator]; // 빈 배열은 항등원 반환
-		return this.opReduce(operator, true);
-	};
-	let innerOperator = operator.addCamelPrefix('inner');
-	Array.prototype[innerOperator] = function(depth){ // [[10,20],[30,5]].addInnerReduce() = [30,35]
-		depth ??= 1;
-		if(depth >= 2)
-			return this.map(a=>a.isArray()?a[innerOperator](depth-1):a);
-		if(depth >= 1)
-			return this.map(a=>a.isArray()?a[operator]():a);
-		return this[operator]();
-	};
-	let innerOperatorRTL = operator.addCamelPrefix('inner') + 'RTL';
-	Array.prototype[innerOperatorRTL] = function(depth){ // [[10,20],[30,5]].addInnerReduce() = [30,35]
-		depth ??= 1;
-		if(depth >= 2)
-			return this.map(a=>a.isArray()?a[innerOperatorRTL](depth-1):a);
-		if(depth >= 1)
-			return this.map(a=>a.isArray()?a[operator+'RTL']():a);
-		return this[operator+'RTL']();
-	};
-}
 
 
 // [덧셈-]곱셈-거듭제곱 함수
 
 Array.prototype.mulPow = function(){
-	return this.reduce((a,b)=>b.isArray()?a.mul(b.superReduce('pow')):a.mul(b));
-	//return this.reduce((a,b)=>b.isArray()?(b.opTag=='div'?a.div(b.powSuperReduce()):a.mul(b.powSuperReduce())):a.mul(b));
+	return this.reduce((a,b)=>b.isGeneralArray()?a.mul(b.superReduce('pow')):a.mul(b));
+	//return this.reduce((a,b)=>b.isGeneralArray()?(b.opTag=='div'?a.div(b.powSuperReduce()):a.mul(b.powSuperReduce())):a.mul(b));
 };
 
 Array.prototype.addMulPow = function(){
-	return this.reduce((a,b)=>b.isArray()?a.add(b.mulPow()):a.add(b));
+	return this.reduce((a,b)=>b.isGeneralArray()?a.add(b.mulPow()):a.add(b));
 };
 
+/*
+
+배열 분류
+[1,4,3,5,7,3.5].classify({'0':x=>x.isEven(), '1':x=>x.isOdd()}, 2);
+	= {'0':[4], '1':[1,3,5,7], '2':[3.5]}
+*/
+
+/*
+Array.prototype.classify = function(classifier, otherwise){
+	let classified = {};
+	
+	for(let key in classifier){
+		classified[key] = [];
+	};
+	
+	this.forEach(val=>{
+		let found = false;
+		for(let key in classifier){
+			classified[key].push(val);
+			found = true;
+			break;
+		}
+		if(!found && otherwise) classified[otherwise] = val;
+	});
+	
+	return classified;
+};
+*/
 
 ////////////////
 // 배열연산자 //
+////////////////
+// 집계메소드 //
 ////////////////
 
 Array.prototype.sum = function(){ // sum은 addReduce와는 달리 NA를 무시함
@@ -3157,6 +4442,12 @@ Array.prototype.sum = function(){ // sum은 addReduce와는 달리 NA를 무시�
 	if(!dna.length) return 0; // 합계의 특징상 하나라도 없으면 에러 대신에 0을 반환해야 함
 	return dna.add();
 };
+
+/*
+Array.prototype.sum.usePointer = function(pointer){
+	
+};
+*/
 
 Array.prototype.min = function(){
 	if(!this.isValidArray()) return Array.NaA;
@@ -3172,15 +4463,15 @@ Array.prototype.max = function(){
 // [1,4,2,8] / 4
 // [[1,4],[2,8],[NA,[7]],6] / [3,[4]]
 Array.prototype.mean = function(){
-	return this.sum().div(this.cardinality()).NaNtoNA();
+	return this.sum().div(this.N());
 };
 
 // 멱평균 (1=산술, 0=기하, -1=조화)
 Array.prototype.powerMean = function(p){ // Infinity, 0이 아닌 너무 크거나 작은 값 등은 계산오류가 발생함
 	p ??= 0; // 기하평균
 	if(p.isFinite())
-		return p ? this.pow(p).sum().div(this.cardinality()).pow(1/p) : 
-			this.log().sum().div(this.cardinality()).exp();
+		return p ? this.pow(p).sum().div(this.N()).pow(1/p) : 
+			this.log().sum().div(this.N()).exp();
 	return p > 0 ? this.abs().max() : this.abs().min(); // 무한대 값을 준 경우
 }; // 하이퍼 파라미터 문제 있음
 
@@ -3188,7 +4479,7 @@ Array.prototype.var = function(){ // [100,50,70,[80,90,NA]].stdev()
 	let dna = this.dropNA();
 	let s = dna.mean();
 	
-	return dna.reduce((a,b)=>a.add(b.sqSub(s)),0).div(this.cardinality());
+	return dna.reduce((a,b)=>a.add(b.sqSub(s)),0).div(this.N());
 	//return (this.reduce((a,b)=>a+(b-s)*(b-s),0) / dna.length) ** 0.5;
 };
 
@@ -3196,7 +4487,7 @@ Array.prototype.stdev = function(){ // [100,50,70,[80,90,NA]].stdev()
 	let dna = this.dropNA();
 	let s = dna.mean();
 	
-	return dna.reduce((a,b)=>a.add(b.sqSub(s)),0).div(this.cardinality()).sqrt();
+	return dna.reduce((a,b)=>a.add(b.sqSub(s)),0).div(this.N()).sqrt();
 	//return (this.reduce((a,b)=>a+(b-s)*(b-s),0) / dna.length) ** 0.5;
 };
 
@@ -3218,64 +4509,6 @@ Array.prototype.cadr = function(){ return this[1]; };
 Array.prototype.caddr = function(){ return this[2]; };
 Array.prototype.cadddr = function(){ return this[3]; };
 
-Array.prototype._lisp = function(stackTrace){ // ['add', 1, ['minus', 3], ['mul', 7, ['sub', 6, 3]]] :: 1+(-3)+(7*(6-3))
-	let fname = this.car();
-	let array = this.cdr();
-	
-	try{
-		if(stackTrace){
-			stackTrace.length = this.length;
-			stackTrace.fill('-');
-			stackTrace[0]='😊'+fname;
-		}
-	
-		if(!fname.isString()) return NA; // 함수 이름이 아님
-		// list와 array의 차이점
-		// list는 안에 연산을 하지 않고 array는 연산을 한다.
-		if(fname == 'list') return array; // 목록 생성인 경우는 배열을 생성하고 그 안에는 연산을 하지 않음
-		array = array.map((x,i)=>x.typeof == 'array' ? x._lisp(stackTrace?(stackTrace[i]=[]):null) : x);
-		if(fname == 'exec') return array.car()._lisp(); // 해당 배열을 실행하기 (NA검증완료)
-		
-		// 속성제어
-		if(fname.getCamelPrefix() == 'get'){ // 반환
-			if(fname == 'get') return nullToNA(array.cadr()[array.car()]); // ['get', 'length', ['list', 3, 5, 9]].lisp() = 3
-			return nullToNA(array.car()[fname.removeCamelPrefix()]); // ['getLength', ['list', 3, 5, 9]].lisp() = 3
-		}
-		if(fname.getCamelPrefix() == 'set'){ // 설정과 동시에 반환
-			if(fname == 'set') return nullToNA(array.cadr()[array.car()] = array.caddr()); // ['set', 'href', location, '~~~'].lisp()
-			return nullToNA(array.car()[fname.removeCamelPrefix()] = array.cadr()); // ['setHref', 'location', '~~~'].lisp()
-		}
-		if(fname.getCamelPrefix() == 'del'){ // 속성 삭제
-			if(fname == 'del') delete array.cadr()[array.car()];
-			delete array.car()[fname.removeCamelPrefix()];
-			return NA;
-		}
-		
-		if(fname == 'array') return array;
-		
-		
-		switch(NNARY_OPERATORS[fname]){
-			//case 1: return array.car()[fname](); // 연산자들
-			case 2: return nullToNA(array[fname+'Reduce']()); // 이항의 경우만 리듀싱 하고 그외는 함수 호출을 함
-			default: return nullToNA(array.car()[fname](...array.cdr())); // Ex: inRange --> ['inRange', 10, 3, 12] --> true
-			// 일반적인 함수실행
-			// ['mean', ['list', 3, 5, 8]] 등등
-		}
-	}catch(e){
-		if(stackTrace) stackTrace[0]='💣'+fname;
-		return e;
-	} // 에러는 반환 형태로...
-};
-
-Array.prototype.lisp = function(stackTrace){
-	if(stackTrace){
-		stackTrace.length = 0;
-	}
-	
-	return this._lisp(stackTrace);
-};
-
-// 추후 asmdp 예정
 
 // 배열 전체 비교 (길이도 체크함)
 
@@ -3283,7 +4516,7 @@ Array.prototype.lisp = function(stackTrace){
 Array.prototype.naValueObject = function(v){return this;}; // 객체 자체 NA값 처리이므로, 배열 각 내부는 naValue 사용
 
 Array.prototype.similarObject = function(other){ // 배열이 같은지 비교, '0' 과 0 정도만 허용하고 모양이 다르면 바로 false 처리함
-	return this == other || other.isArray() && this.length == other.length && this.every((a,i)=>a.similarObject(other[i]));
+	return this == other || other.isGeneralArray() && this.length == other.length && this.every((a,i)=>a.similarObject(other[i]));
 };
 
 Array.prototype.notSimilarObject = function(other){
@@ -3291,7 +4524,7 @@ Array.prototype.notSimilarObject = function(other){
 };
 
 Array.prototype.equalObject = function(other){ // 배열이 같은지 비교, '0' 과 0 정도만 허용하고 모양이 다르면 바로 false 처리함
-	return other.isArray() && this.length == other.length && this.every((a,i)=>a.equalObject(other[i]));
+	return other.isGeneralArray() && this.length == other.length && this.every((a,i)=>a.equalObject(other[i]));
 };
 
 Array.prototype.notEqualObject = function(other){
@@ -3299,7 +4532,7 @@ Array.prototype.notEqualObject = function(other){
 };
 
 Array.prototype.identicalObject = function(other){
-	return other.isArray() && this.length == other.length && this.every((a,i)=>a.identicalObject(other[i]));
+	return other.isGeneralArray() && this.length == other.length && this.every((a,i)=>a.identicalObject(other[i]));
 };
 
 Array.prototype.notIdenticalObject = function(other){
@@ -3309,7 +4542,7 @@ Array.prototype.notIdenticalObject = function(other){
 Array.prototype._EachObject = function(what, other){
 	what += 'Object';
 	if(this.NaA) return Array.NaA;
-	if(other.isArray()){
+	if(other.isGeneralArray()){
 		if(this.length != other.length && this.length != 1 && other.length != 1) return Array.NaA;
 		return this.map((x,i)=>x[what](other[i]));
 	}
@@ -3324,13 +4557,14 @@ for(let op of ['equal', 'identical', 'notEqual', 'notIdentical']){
 
 
 // 깊이 내부 연산자, 모든 배열 연산자에 해당됨
+/*
 
 for(let aop of ARRAY_UNARY_OPERATORS){ // 단항 배열 연산자
 	let innerAop = aop.addCamelPrefix('inner');
 	Array.prototype[innerAop] = function(depth){
 		depth ??= 1;
 		if(depth >= 2)
-			return this.map((x,i)=>(x.isArray()?x:[x])[innerAop](depth-1));
+			return this.map((x,i)=>(x.isGeneralArray()?x:[x])[innerAop](depth-1));
 		if(depth >= 1){
 			return this.map((x,i)=>x[aop]()); // Broadcasting
 		}
@@ -3343,9 +4577,9 @@ for(let aop of ARRAY_BINARY_OPERATORS){ // 이항 배열 연산자
 	Array.prototype[innerAop] = function(depth, other){
 		if(other === undefined){ other = depth; depth = 1;}
 		if(depth >= 2)
-			return this.map((x,i)=>(x.isArray()?x:[x])[innerAop](depth-1, other));
+			return this.map((x,i)=>(x.isGeneralArray()?x:[x])[innerAop](depth-1, other));
 		if(depth >= 1){
-			if(other.isArray()){
+			if(other.isGeneralArray()){
 				if(other.length == 1) // Broadcasting
 					return this.map((x,i)=>x[aop](other[0]));
 				return this.map((x,i)=>x[aop](other[i]));
@@ -3365,13 +4599,16 @@ for(let aop of ARRAY_TERNARY_OPERATORS){ // 삼항 이상 배열 연산자, 단�
 	Array.prototype[innerAop] = function(depth, ...args){
 		depth ??= 1;
 		if(depth >= 2)
-			return this.map((x,i)=>(x.isArray()?x:[x])[innerAop](depth-1, ...args));
+			return this.map((x,i)=>(x.isGeneralArray()?x:[x])[innerAop](depth-1, ...args));
 		if(depth >= 1){
 			return this.map((x,i)=>x[aop](...args)); // Broadcasting
 		}
 		return this[aop](...args);
 	};
 }
+
+*/
+
 
 /*
 Array.prototype.mode = function(){ // 최빈값
@@ -3396,8 +4633,9 @@ Array.prototype.setAttrEach = function(x, val){
 };
 
 Array.prototype.funcall = function(x, ...args){ // map과 다른 점은 각 객체의 내부 메소드를 실행한다.
-	return this.map(a=>a.isArray() ? a.funcall(x, ...args) : a[x](...args));
+	return this.map(a=>a.isGeneralArray() ? a.funcall(x, ...args) : a[x](...args));
 };
+// 위의 3개 삭제 예정, unary 등으로 대체
 
 /* 권장하지 않음
 Array.prototype.expr = function(vx, vy, expr, other){ // x, y로 이루어진 식 사용, From식 굳이 필요 없음
@@ -3440,7 +4678,7 @@ Array.prototype.isValidMatrix = function(){
 // 형태 조정
 
 Array.prototype.superFlat = function(){ // 완전히 평탄화 시킴
-	if(this.every(x=>!x.isArray())) return this;
+	if(this.every(x=>!x.isGeneralArray())) return this;
 	return this.flat().superFlat();
 };
 
@@ -3450,9 +4688,9 @@ Array.prototype.superFlat = function(){ // 완전히 평탄화 시킴
 Array.prototype.reshape = function(shape){
 	// 두 배열 모두 배열이 아니거나 유효한 배열이 아닌 경우 NaA 반환
 	// 단, 현재 배열은 유효성은 모르나 일단 배열임
-	if(!this.isValidArray() || !shape.isArray() || !shape.isValidArray()) return Array.NaA;
+	if(!this.isValidArray() || !shape.isGeneralArray() || !shape.isValidArray()) return Array.NaA;
 	let that = this;
-	return shape.map(x=>x.isArray()?that.reshape(x):nullToNA(that[x]));
+	return shape.map(x=>x.isGeneralArray()?that.reshape(x):nullToNA(that[x]));
 };
 
 
@@ -3481,6 +4719,245 @@ Array.prototype.matMulFrom = function(other){
 
 
 // 표기 고안중
+
+
+
+
+// 실제 값 접근, 일반 Array는 기존 적용
+
+/*
+
+ArrayPointer : 배열 접근 도우미
+============
+
+Array에는 a[0], a[1] 등 일반 접근도 존재하지만
+a.val 을 사용한다면 a.val[-1] 등 끝 값도 접근할 수 있음 (Python과 동일)
+a.values 를 통해서 현재 배열 객체에 집어넣을 수도 있으며
+배열 객체가 아닌 경우 fill을 통해서 전체 값을 채워 넣을 수도 있음
+
+- a.val[i]                      : 단일 값 접근 -> a[i]로 변경 예정
+- a.left(N).value            : 첫 N개 값 접근
+- a.right(N).value           : 뒤 N개 값 접근
+- a.mid(M,N).value           : M부터 N까지 구간 값 접근
+- a.all.value                : 전체 접근
+- a.pickptr(indices).value      : 특정 첨자 접근 (추후 예정)
+- a.maskptr(booleanArray).value : 불리언 마스킹
+
+
+<<단일 접근>>
+
+a = [1,4,2,8,5,7,3,6,9];
+a.val[3];  // 8
+a.val[-2]; // 6
+a.val[5] = 10; a; // [1,4,2,8,5,10,3,6,9]
+
+a[3] 등을 통해서 가능하나, 원시값(raw) 접근이므로
+ScaledArray에서는 환산되기 전의 값을 취급하므로 .val로 하는 것을 권장함
+
+<<슬라이싱 및 필링>>
+
+a = [1,4,2,8,5,7,3,6,9];
+
+a.mid(2,-2).value;             // Slicing Get // [2,8,5,7,3] == a.slice(2,-2)
+a.mid(2,-2).value = [1, 7]; a; // Slicing Set // [1,4,1,7,6,9] Python의 a[2:5] = [1, 7] 와 동일
+a.mid(2,-2).value = 10; a;     // Filling     // [1,4,10,10,10,10,10,6,9] 
+a.mid(2,-2).value = []; a;     // Drop        // [1,4,6,9]
+
+// TypedArray 모두 적용 가능하지만, Slicing Set 적용 시 길이 불일치 시 RangeError 발생
+
+<<리버싱 및 스텝 포인터>>
+
+a = [1,4,2,8,5,7,3,6,9];
+a.rev.value               // [9,6,3,7,5,8,2,4,1];
+a.step(2).value           // [1,2,5,3,9]
+a.step(-2).value          // [9,3,5,2,1]
+a.mid(2,-2,-1).value      // [3,7,5,8,2]
+a.mid(2,-2,2).value       // [2,5,3]
+a.mid(2,-2,-3).value      // [3,8]
+
+
+
+*/
+
+Array.prototype.__defineGetter__('value', function(){
+	return this;
+});
+
+Array.prototype.__defineSetter__('value', function(arr){
+	if(arr.isArray())
+		this.paste(arr);
+	else
+		this.fill(arr);
+});
+
+/*
+const ArrayPartialRun = {
+	get: function(target, fn){
+		return 
+	},
+};
+*/
+
+// 숫자 첨자를 계산하기 위한 조치, .val 떼기
+// 진짜 배열로 위장을 했기 때문에 이제 every some 등 Primitive Method 사용 가능
+
+class APIndexing{
+	constructor(){
+		return this.proxy = new Proxy(this, {
+			get: (object, key) => {
+				if(typeof key !== 'symbol' && !Number.isNaN(Number(key))){
+					return object.at(key);
+				}
+				if(Reflect.has(object, key))
+					return Reflect.get(object, key);
+				return Reflect.get(object.target, key);
+			},
+			set: (object, key, value) => {
+				if(typeof key !== 'symbol' && !Number.isNaN(Number(key))){
+					object.setAt(key, value);
+					return true;
+				}
+				Reflect.set(object, key, value);
+				return true;
+			},
+			has: (object, key) => {
+				if(typeof key !== 'symbol' && !Number.isNaN(Number(key))){
+					return true;
+				}
+				if(Reflect.has(object, key))
+					return Reflect.has(object.target, key);
+				return Reflect.has(object, key);
+			},
+		});
+	}
+};
+
+class ArrayPointer extends APIndexing{
+	constructor(target, start, end, reversed){
+		super();
+		
+		this.target = target;
+		this.start = (start ?? 0);
+		this.end = (end ?? this.target.length);
+		this.reversed = reversed ?? false;
+		
+		if(this.start == 0 && 1/this.start < 0) this.start = target.length; // -0
+		else if(this.start < 0) this.start += target.length;
+		
+		if(this.end == 0 && 1/this.end < 0) this.end = target.length; // -0
+		else if(this.end < 0) this.end += target.length;
+		
+		this.start = this.start.fitInRange(0, this.target.length, '[)');
+		this.end = this.end.fitInRange(0, this.target.length, '[)');
+		
+		
+	};
+	get value(){
+		return this.target.slice(this.start, this.end).optional(this.reversed, 'reverse');
+	};
+	set value(v){
+		if(v.isArray()){ // 배열은 splice(대체) 적용
+			if(this.reversed) v = v.reverseCopy(); // 거꾸로 처리하기에 원본 훼손 없이 역순 카피
+			//if(v.num === undefined)
+			this.target.splice(this.start, this.end-this.start, ...v); // ... 연산자 환산 완료
+			//else // ScaledArray 같은 경우는 반드시 환산 적용해야 함, '...' 연산자는 환산을 무시함
+				//this.target.splice(this.start, this.end-this.start, ...v.toFloat64Array());
+		}else{ // 배열이 아니면 fill(채움) 적용, 채움은 어차피 똑같아서 거꾸로 안해도 됨
+			this.target.fill(v, this.start, this.end);
+		}
+		return true;
+	};
+	valueOf(){
+		return this.target.slice(this.start, this.end).optional(this.reversed, 'reverse');
+	};
+	toString(){
+		return this.target.slice(this.start, this.end).optional(this.reversed, 'reverse').toString();
+	};
+	toStringEx(){
+		return '*'+this.target.slice(this.start, this.end).optional(this.reversed, 'reverse').toStringEx();
+	};
+	// 불필요한 서브어레이 생성 없이 연산함
+	// 모든 메소드 위장하기
+	
+	get length(){
+		return Math.max(0,this.end - this.start);
+	};
+	
+	_realIndex(idx){ // 포인터 상의 인덱스를 참조하는 배열 또는 포인터의 인덱스로 변환
+		let len = this.length;
+		if(idx < 0) idx += len;
+		if(this.reversed) idx = len - 1 - idx; // 반전된 경우
+		if(!idx.inRange(0, len, '[)')) throw new ArrayBoundaryError('범위 초과 | '+(idx));
+		return idx + this.start;
+	};
+	at(idx){
+		return this.target.at(this._realIndex(Number(idx)));
+	};
+	setAt(idx,val){
+		this.target[this._realIndex(Number(idx))] = val;
+		return this;
+	};
+	
+	get val(){
+		return new Proxy(this, {
+			get: function(pointer, i){
+				return pointer.at(+i);
+			},
+			set: function(pointer, i, v){		
+				pointer.target[pointer._realIndex(+i)] = v;
+				return true;
+			},
+		});
+	};
+	
+	get broadcast(){
+		return new Proxy({target:this.proxy, onair:true}, ArrayBroadcastHandler);
+	};
+	get inner(){
+		return new Proxy({target:this.proxy, depth:1}, SimpleArrayBroadcastHandler);
+	};
+	[Symbol.iterator](){ // for of 문, ...문 사용 시에도 변조가 필요함
+		let that = this;
+		let i = -1;
+		return{
+			next: () => ({value: ++i < that.length ? that.at(i) : 0, done:!(i<that.length)})
+		};
+	};
+	// reverseCopy는 저기(target)서 도와줌
+	// 위장을 하기 위해 실제 배열로 위장
+	isArray(){
+		return true;
+	};
+	isGeneralArray(){
+		return true;
+	};
+};
+
+/*
+Array.prototype.__defineGetter__('inner', function(){
+		return new Proxy({object:this,depth:1}, handler);
+	});
+*/
+
+Array.prototype.mid = function(a,b,reversed){
+	return new ArrayPointer(this, a, b, reversed);
+};
+
+Array.prototype.left = function(a, reversed){
+	return new ArrayPointer(this, 0, a, reversed);
+};
+
+Array.prototype.right = function(a, reversed){
+	return new ArrayPointer(this, this.length-a, this.length, reversed)
+};
+
+Array.prototype.__defineGetter__('all', function(){
+	return new ArrayPointer(this, 0, this.length, false);
+});
+
+Array.prototype.__defineGetter__('rev', function(){
+	return new ArrayPointer(this, 0, this.length, true);
+});
 
 
 
@@ -3517,9 +4994,10 @@ Array.prototype.setLabelAsIndex = function(){
 
 
 // 대괄호 포함된 toString 함수, 중첩 포함됨
+// 각 내부 요소에 toStringEx이 없는 메소드는 toString를 사용
 Array.prototype.toStringEx = function(){
 	if(this.NaA) return 'NaA';
-	return '['+this.map(x=>x.toStringEx())+']';
+	return '['+this.map(x=>x.toStringEx ? x.toStringEx() : x.toString())+']';
 };
 
 // 테이블로 보기 편하게 HTML 코드 생성하는 함수
@@ -3605,7 +5083,7 @@ String.prototype.assign = function(obj){
 		
 		return Function(...idf_names,'return '+match+';')(...idf_values);
 	});
-	}catch(e){return '#'+e.name+'#';}
+	}catch(e){console.warn(new ETW(e));return '#'+e.name+'#';}
 };
 
 // 문자열 채우기
@@ -3634,7 +5112,7 @@ String.prototype.empty_fill = function(c, n){
 
 
 // 숫자 영 채우기, 다른 문자는 문자열 변환 후 사용
-Number.prototype.zero_fill = function(n){
+Number.prototype.zero_fill = function(n){ // String.padStart, padEnd 가 생겨서 필요 없을 것이나 호환성 위해...
 	switch(Math.sign(this)){
 		case  1: return this.toString().empty_fill(0, n);
 		case  0: return '0'.repeat(n);
@@ -3643,22 +5121,17 @@ Number.prototype.zero_fill = function(n){
 	}
 };
 
-// 형변환 (parseInt, parseFloat)
-// 배열의 각 엘리멘트 형변환은 .toInt(), .toFloat() 등 이용
-Boolean.prototype.parseInt = function(){ return +this;};
-Number.prototype.parseInt = 
-String.prototype.parseInt = function(){ return parseInt(this); };
-Array.prototype.parseInt = function(){ return NA; };
-
-Boolean.prototype.parseFloat = function(){ return +this;};
-Number.prototype.parseFloat = 
-String.prototype.parseFloat = function(){ return parseFloat(this); };
-Array.prototype.parseFloat = function(){ return NA; };
 
 // NaN은 == 연산자에서 잘못된 결과가 나오므로 NA로 변환하기를 권고함, 배열은 각 요소에서 처리함
 Boolean.prototype.NaNtoNA = 
 String.prototype.NaNtoNA = function(){ return this.valueOf();};
 Number.prototype.NaNtoNA = function(){ return isNaN(this)?NA:this.valueOf();};
+
+Boolean.prototype.NAtoNaN = 
+String.prototype.NAtoNaN = 
+Number.prototype.NAtoNaN = function(){ return this.valueOf();};
+
+
 
 // CLEAR! '{{a}} + {{b}} = {{a+b}}'.assign({a:10, b:20})
 
@@ -3699,7 +5172,7 @@ Array.prototype.normalize = function(m2, s2){ // 표준화
 
 Array.prototype.rate = function(k){ // 점유율, 득표율 등 계산
 	let sum = this.sum();
-	return this.map(a=>a.div(sum).mul(k ?? 1));
+	return this.map(a=>a.truediv(sum).mul(k ?? 1));
 };
 
 Array.prototype.fitMinMax = function(minTo, maxTo){ // 최대-최소 스케일링
@@ -3716,18 +5189,1490 @@ Array.prototype.fitMinMax = function(minTo, maxTo){ // 최대-최소 스케일�
 	return this.map(a=>(a - minFrom) / (maxFrom - minFrom) * (maxTo - minTo) + minTo);
 };
 
+/*
+TypedArray  : 1차원 배열 취급
+TypedMatrix : 2차원 배열 취급
+TypedTensor : 3차원 배열 취급
+DataFrame   : Pandas와 유사
+
+[Primitive]
+Int8, Int16, Int32
+Uint8, Uint16, Uint32
+Float32, Float64
+BigInt64, BigUint64
+
+[Extended - 지원 예정]
+Int24, Uint24 -> high : Uint8, Int8, low: Uint16 -> proxy 접근 방식
+
+BIN(BigInt(정수)+Number(소수부)), Real(16byte), Fraction(8byte)
+
+전 유형 일반 Array 거의 동일한 Array Spec 적용, Inner Spec은 Matrix에만 적용
+String Spec 적용 제외, 성능 최적화 상으로
+
+*/
+
+// 단축 명칭
+
+Array.nm = Array.prototype.nm = 'GA'; // General Array
+Int8Array   .nm = Int8Array   .prototype.nm = 'I8A';
+Int16Array  .nm = Int16Array  .prototype.nm = 'I16A';
+Int32Array  .nm = Int32Array  .prototype.nm = 'I32A';
+Uint8Array  .nm = Uint8Array  .prototype.nm = 'U8A';
+Uint16Array .nm = Uint16Array .prototype.nm = 'U16A';
+Uint32Array .nm = Uint32Array .prototype.nm = 'U32A';
+Float32Array.nm = Float32Array.prototype.nm = 'F32A';
+Float64Array.nm = Float64Array.prototype.nm = 'F64A';
+
+Int8Array   .isIntArray = Int8Array   .prototype.isIntArray = true;
+Int16Array  .isIntArray = Int16Array  .prototype.isIntArray = true;
+Int32Array  .isIntArray = Int32Array  .prototype.isIntArray = true;
+Uint8Array  .isIntArray = Uint8Array  .prototype.isIntArray = true;
+Uint16Array .isIntArray = Uint16Array .prototype.isIntArray = true;
+Uint32Array .isIntArray = Uint32Array .prototype.isIntArray = true;
+Float32Array.isIntArray = Float32Array.prototype.isIntArray = false;
+Float64Array.isIntArray = Float64Array.prototype.isIntArray = false;
+
+Int8Array.RAW_MIN_VALUE = -0x80;
+Int16Array.RAW_MIN_VALUE = -0x8000;
+Int32Array.RAW_MIN_VALUE = -0x80000000;
+Uint8Array.RAW_MIN_VALUE = 0;
+Uint16Array.RAW_MIN_VALUE = 0;
+Uint32Array.RAW_MIN_VALUE = 0;
+Float32Array.RAW_MIN_VALUE = Number.MIN_VALUE;
+Float64Array.RAW_MIN_VALUE = Number.MIN_VALUE;
+
+Int8Array.RAW_MAX_VALUE = 0x7F;
+Int16Array.RAW_MAX_VALUE = 0x7FFF;
+Int32Array.RAW_MAX_VALUE = 0x7FFFFFFF;
+Uint8Array.RAW_MAX_VALUE = 0xFF;
+Uint16Array.RAW_MAX_VALUE = 0xFFFF;
+Uint32Array.RAW_MAX_VALUE = 0xFFFFFFFF;
+Float32Array.RAW_MAX_VALUE = Number.MAX_VALUE;
+Float64Array.RAW_MAX_VALUE = Number.MAX_VALUE;
+
+Int8Array.RAW_EPSILON = 1;
+Int16Array.RAW_EPSILON = 1;
+Int32Array.RAW_EPSILON = 1;
+Uint8Array.RAW_EPSILON = 1;
+Uint16Array.RAW_EPSILON = 1;
+Uint32Array.RAW_EPSILON = 1;
+Float32Array.RAW_EPSILON = 2**-23;
+Float64Array.RAW_EPSILON = Number.EPSILON;
+
+
+class TAPIndexing{
+	constructor(){
+		return this.proxy = new Proxy(this, {
+			get: (object, key) => {
+				if(typeof key !== 'symbol' && !Number.isNaN(Number(key))){
+					return object.at(key);
+				}
+				if(Reflect.has(object, key))
+					return Reflect.get(object, key);
+				return Reflect.get(object.target, key);
+			},
+			set: (object, key, value) => {
+				if(typeof key !== 'symbol' && !Number.isNaN(Number(key))){
+					object.setAt(key, value);
+					return true;
+				}
+				Reflect.set(object, key, value);
+				return true;
+			},
+			has: (object, key) => {
+				if(typeof key !== 'symbol' && !Number.isNaN(Number(key))){
+					return true;
+				}
+				if(Reflect.has(object, key))
+					return Reflect.has(object.target, key);
+				return Reflect.has(object, key);
+			},
+		});
+	}
+};
+
+
+class TypedArrayPointer extends TAPIndexing{
+	constructor(target, start, end, reversed){
+		super();
+		
+		this.target = target;
+		this.start = (start ?? 0);
+		this.end = (end ?? this.target.length);
+		this.reversed = reversed ?? false;
+		
+		if(this.start == 0 && 1/this.start < 0) this.start = target.length; // -0
+		else if(this.start < 0) this.start += target.length;
+		
+		if(this.end == 0 && 1/this.end < 0) this.end = target.length; // -0
+		else if(this.end < 0) this.end += target.length;
+		
+		this.start = this.start.fitInRange(0, this.target.length, '[)');
+		this.end = this.end.fitInRange(0, this.target.length, '[)');
+		
+		
+	};
+	get value(){
+		return this.target.slice(this.start, this.end);
+	};
+	set value(v){
+		if(v.isArray()){
+			if(this.end - this.start != v.length)
+				throw new RangeError('배열 개수 불일치 (단, 배열이 아닌 원소의 경우는 채워넣기 진행)');
+			this.target.set(v.num === undefined ? v : v.toFloat64Array(), this.start);
+		}else
+			this.target.fill(v, this.start, this.end);
+	};
+	valueOf(){
+		return this.target.slice(this.start, this.end).optional(this.reversed, 'reverse');
+	};
+	toString(){
+		return this.target.slice(this.start, this.end).optional(this.reversed, 'reverse').toString();
+	};
+	toStringEx(){
+		return '*'+this.target.slice(this.start, this.end).optional(this.reversed, 'reverse').toStringEx();
+	};
+	// 불필요한 서브어레이 생성 없이 연산함
+	// 모든 메소드 위장하기
+	
+	get length(){
+		return Math.max(0,this.end - this.start);
+	};
+	
+	_realIndex(idx){ // 포인터 상의 인덱스를 참조하는 배열 또는 포인터의 인덱스로 변환
+		let len = this.length;
+		if(idx < 0) idx += len;
+		if(this.reversed) idx = len - 1 - idx; // 반전된 경우
+		if(!idx.inRange(0, len, '[)')) throw new ArrayBoundaryError('범위 초과 | '+(idx));
+		return idx + this.start;
+	};
+	at(idx){
+		return this.target.at(this._realIndex(Number(idx)));
+	};
+	setAt(idx,val){
+		return this.target.setAt(this._realIndex(Number(idx)), val);
+	};
+	
+	get val(){
+		return new Proxy(this, {
+			get: function(pointer, i){
+				return pointer.at(+i);
+			},
+			set: function(pointer, i, v){		
+				pointer.target[pointer._realIndex(+i)] = v;
+				return true;
+			},
+		});
+	};
+	
+	[Symbol.iterator](){ // for of 문, ...문 사용 시에도 변조가 필요함
+		let that = this;
+		let i = -1;
+		return{
+			next: () => ({value: ++i < that.length ? that.at(i) : 0, done:!(i<that.length)})
+		};
+	};
+	// reverseCopy는 저기(target)서 도와줌
+	// 위장을 하기 위해 실제 배열로 위장
+	isArray(){
+		return true;
+	};
+	isGeneralArray(){
+		return true;
+	};
+};
+
 
 /*
-// 체인 방식으로 객체를 추가(편집)/삭제함
-Object.prototype.addAttribute = function(a, v){this[a] = v; return this;};
-Object.prototype.removeAttribute = function(a){delete this[a]; return this;};
-Object.prototype.addAttributes = function(dict){for(var key in dict) this[key] = dict[key]; return this;};
-
-// 별칭
-Object.prototype.adda = 
-	Object.prototype.setAttribute = 
-	Object.prototype.addAttribute;
-
-Object.prototype.rema = 
-	Object.prototype.removeAttribute;
+class TypedArrayPointer extends TAPIndexing{
+	constructor(target, start, end){
+		super();
+		this.target = target;
+		this.start = start;
+		this.end = end;
+		
+		if(this.start == 0 && 1/this.start < 0) this.start = target.length; // -0
+		else if(this.start < 0) this.start += target.length;
+		
+		if(this.end == 0 && 1/this.end < 0) this.end = target.length; // -0
+		else if(this.end < 0) this.end += target.length;
+		
+	};
+	at(idx){
+		return this.target.at(this.start + idx);
+	};
+	get value(){
+		return this.target.slice(this.start, this.end);
+	};
+	set value(v){
+		if(v.isArray()){
+			if(this.end - this.start != v.length)
+				throw new RangeError('배열 개수 불일치 (단, 배열이 아닌 원소의 경우는 채워넣기 진행)');
+			this.target.set(v.num === undefined ? v : v.toFloat64Array(), this.start);
+		}else
+			this.target.fill(v, this.start, this.end);
+	};
+	valueOf(){
+		return this.target.slice(this.start, this.end);
+	};
+	toString(){
+		return this.target.slice(this.start, this.end).toString();
+	};
+	toStringEx(){
+		return '*'+this.target.slice(this.start, this.end).toStringEx();
+	};
+	isArray(){
+		return true;
+	};
+	isTypedArray(){
+		return true;
+	};
+};
 */
+
+
+//Fixed16Array, Fixed32Array
+
+// 타 데이터타입과 연산시의 형변환표, Array와 연산 시 모두 Array로 변환
+// Numpy의 규정에서 약간 변형 (Int64, Uint64 제외)
+// ScaledNArray는 자기 자신이여도 무조건 Float64Array로 변환, 단, Float32Array와 연산 시는 Float32Array 적용
+
+const TYPE_BINARY_OP = {
+	'I8A':  {'I8A':'I8A',  'I16A':'I16A', 'I32A':'I32A', 'U8A':'I16A', 'U16A':'I32A', 'U32A':'F64A', 'F32A':'F32A', 'F64A':'F64A', 'S8A':'F64A', 'S16A':'F64A', 'S32A':'F64A', 'GA':'GA'},  
+	'I16A': {'I8A':'I16A', 'I16A':'I16A', 'I32A':'I32A', 'U8A':'I16A', 'U16A':'I32A', 'U32A':'F64A', 'F32A':'F32A', 'F64A':'F64A', 'S8A':'F64A', 'S16A':'F64A', 'S32A':'F64A', 'GA':'GA'},  
+	'I32A': {'I8A':'I32A', 'I16A':'I32A', 'I32A':'I32A', 'U8A':'I32A', 'U16A':'I32A', 'U32A':'F64A', 'F32A':'F64A', 'F64A':'F64A', 'S8A':'F64A', 'S16A':'F64A', 'S32A':'F64A', 'GA':'GA'},  
+	'U8A':  {'I8A':'I16A', 'I16A':'I16A', 'I32A':'I32A', 'U8A':'U8A',  'U16A':'U16A', 'U32A':'U32A', 'F32A':'F32A', 'F64A':'F64A', 'S8A':'F64A', 'S16A':'F64A', 'S32A':'F64A', 'GA':'GA'},  
+	'U16A': {'I8A':'I32A', 'I16A':'I32A', 'I32A':'I32A', 'U8A':'U16A', 'U16A':'U16A', 'U32A':'U32A', 'F32A':'F32A', 'F64A':'F64A', 'S8A':'F64A', 'S16A':'F64A', 'S32A':'F64A', 'GA':'GA'},  
+	'U32A': {'I8A':'F64A', 'I16A':'F64A', 'I32A':'F64A', 'U8A':'U32A', 'U16A':'U32A', 'U32A':'U32A', 'F32A':'F64A', 'F64A':'F64A', 'S8A':'F64A', 'S16A':'F64A', 'S32A':'F64A', 'GA':'GA'},  
+	'F32A': {'I8A':'F32A', 'I16A':'F32A', 'I32A':'F64A', 'U8A':'F32A', 'U16A':'F32A', 'U32A':'F64A', 'F32A':'F32A', 'F64A':'F64A', 'S8A':'F32A', 'S16A':'F32A', 'S32A':'F64A', 'GA':'GA'},  
+	'F64A': {'I8A':'F64A', 'I16A':'F64A', 'I32A':'F64A', 'U8A':'F64A', 'U16A':'F64A', 'U32A':'F64A', 'F32A':'F64A', 'F64A':'F64A', 'S8A':'F64A', 'S16A':'F64A', 'S32A':'F64A', 'GA':'GA'},  
+	'S8A':  {'I8A':'F64A', 'I16A':'F64A', 'I32A':'F64A', 'U8A':'F64A', 'U16A':'F64A', 'U32A':'F64A', 'F32A':'F32A', 'F64A':'F64A', 'S8A':'F64A', 'S16A':'F64A', 'S32A':'F64A', 'GA':'GA'},
+	'S16A': {'I8A':'F64A', 'I16A':'F64A', 'I32A':'F64A', 'U8A':'F64A', 'U16A':'F64A', 'U32A':'F64A', 'F32A':'F32A', 'F64A':'F64A', 'S8A':'F64A', 'S16A':'F64A', 'S32A':'F64A', 'GA':'GA'},
+	'S32A': {'I8A':'F64A', 'I16A':'F64A', 'I32A':'F64A', 'U8A':'F64A', 'U16A':'F64A', 'U32A':'F64A', 'F32A':'F64A', 'F64A':'F64A', 'S8A':'F64A', 'S16A':'F64A', 'S32A':'F64A', 'GA':'GA'},
+	'GA':   {'I8A':'GA',   'I16A':'GA',   'I32A':'GA',   'U8A':'GA',   'U16A':'GA',   'U32A':'GA',   'F32A':'GA',   'F64A':'GA',   'S8A':'GA',   'S16A':'GA',   'S32A':'GA',   'GA':'GA'},  
+};
+
+const TYPED_ARRAY_FROM_NM = {
+	'I8A': Int8Array,
+	'I16A': Int16Array,
+	'I32A': Int32Array,
+	'U8A': Uint8Array,
+	'U16A': Uint16Array,
+	'U32A': Uint32Array,
+	'F32A': Float32Array,
+	'F64A': Float64Array,
+	'GA': Array,
+};
+
+const TypedArrays = [Int8Array, Int16Array, Int32Array, Uint8Array, Uint16Array, Uint32Array, Float32Array, Float64Array];
+
+for(let Type of TypedArrays){
+	// 데이터형 체킹
+	Type.prototype.isArray = function(){return true;};
+	Type.prototype.isTypedArray = function(){return true;};
+	
+	// 생성 메소드
+	
+	Type.make = function(array){return new Type(array);};
+	
+	Type.numbers = 
+	Type.makeNumbers = function(start, n, step){ // start부터 n개의 숫자를 step 간격으로
+		if(step == undefined) step = 1;
+		if(n == undefined) n = start, start = 0;
+		n = Math.floor(n);
+		return new Type(n??0).fill(0).map((x,i)=>(start)+i*(step));
+	};
+
+	Type.linspace = 
+	Type.makeLinspace = function(a, b, s){ // a부터 b까지의 숫자를 시작과 끝 포함 s등분함
+		return new Type(s).fill(0).map((x,i)=>a+i*(b-a)/(s-1));
+	};
+
+	Type.randoms = 
+	Type.makeRandoms = function(n,k){ // 정수형의 경우는 항상 0으로만 나오기에 미리 곱해줌
+		return new Type(n).fill(0).map(x=>Math.random() * (k??1));
+	};
+	
+	if(Type.isIntArray){
+		Type.prototype.setScale = function(num, den, bias){
+			this.bias = bias ?? 0;
+			this.num = num ?? 1;
+			this.den = den ?? 1;
+			this.scaled = true;
+			return this;
+		};
+	}
+	
+	
+	// 16진법 문자열에서 불러옴, Big Endian 방식
+	// FEB283501335AA -> FEB2 8350 1335 AA00 (right pad)
+	Type.fromHexSequenceBE = function(str){
+		const NPE = this.BYTES_PER_ELEMENT * 2; // Nibble
+		let arr = new Type(str.length.div(NPE).ceil());
+		
+		arr.length.for(function(i){
+			arr[i] = parseInt(str.slice(i*NPE, (i+1)*NPE).padEnd(NPE,0),16); // 원 데이터이므로 무조건 원 데이터로 접근해야 함
+		});
+		return arr;
+	};
+	
+	Type.prototype.toHexSequenceBE = function(){
+		let s = '';
+		let that = this;
+		this.length.for(function(i){
+			s += (that[i] & ((-1) >>> (32-Type.BYTES_PER_ELEMENT*8))).toString(16).padStart(Type.BYTES_PER_ELEMENT*2,0); 
+		});
+		//if(this.num)
+		//s += ';'+this.num+','+this.den+','+this.bias;
+		return s;
+	};
+	
+	
+	
+	
+	/*
+	// Little Endian 방식
+	// FEB283501335AA -> B2FE 5083 3513 00AA (left pad)
+	Type.fromHexSequenceLE = function(){
+		const NPE = this.BYTES_PER_ELEMENT * 2; // Nibble
+		let arr = new Type(str.length.div().ceil());
+		
+		arr.length.for(function(i){
+			arr[i] = parseInt(str.slice(i*NPE, (i+1)*NPE).padStart(NPE,0),16); // 원 데이터이므로 무조건 원 데이터로 접근해야 함
+		});
+		return arr;
+	};
+	*/
+	
+	
+	
+	
+	// .~~~ 메소드는 스케일 반영
+	
+	if(Type.isIntArray){
+		
+		
+		Type.prototype.getMaxValue = function(){
+			return Type.RAW_MAX_VALUE;
+		};
+		Type.prototype.getMinValue = function(){
+			return Type.RAW_MIN_VALUE;
+		};
+		
+		
+		
+	}else{
+		
+	}
+	
+	// 연산 메소드, 숫자 연산만 허용되므로 unary, binary, ternary를 직접 제공하진 않음
+	
+	Type.prototype.unary = function(op){
+		
+		return this.map(a=>Object.operations[op](a));
+	};
+	
+	Type.prototype.binary = function(op, other){
+		if(other === undefined){
+			return this.length ? this.reduce((a,b)=>Object.operations[op](a,b)) : Number.identities[op];
+		}
+		
+		if(other.isTypedArray()){ // TypedArray op TypedArray
+			let that = this;
+			
+			if(this.length != other.length){
+				if(this.length == 1){
+					if(this.nm == other.nm)
+						return other.map((a,i)=>Object.operations[op](that.at(0), a));
+					return new TYPED_ARRAY_FROM_NM[TYPE_BINARY_OP[this.nm][other.nm]](other.length).map((a,i)=>Object.operations[op](that.at(0), other.at(i)));
+				}
+				if(other.length == 1){
+					if(this.nm == other.nm)
+						return this.map((a,i)=>Object.operations[op](a, other.at(0)));
+					return new TYPED_ARRAY_FROM_NM[TYPE_BINARY_OP[this.nm][other.nm]](this.length).map((a,i)=>Object.operations[op](that.at(i), other.at(0)));
+				}
+				throw new SizeMismatchError(this.length - other.length);
+			}
+			if(this.nm == other.nm)
+				return this.map((a,i)=>Object.operations[op](a, other.at(i)));
+			else{
+				return new TYPED_ARRAY_FROM_NM[TYPE_BINARY_OP[this.nm][other.nm]](this.length).map((a,i)=>Object.operations[op](that.at(i), other.at(i)));
+			}
+		}else if(other.isArray()){ // TypedArray op Array -> Array op Array
+			return this.toArray()[op](other);
+		}else if(typeof other != 'object'){
+			return this.map((a)=>Object.operations[op](a, other));
+		}
+		throw new TypeError('>_< 타입이상!');
+	};
+	
+	Type.prototype.ternary = function(op, other, ...hyper){
+		if(other === undefined){
+			return this.length ? this.reduce((a,b)=>Object.operations[op](a,b, ...hyper)) : Number.identities[op];
+		}
+		if(other.isTypedArray()){ // TypedArray op TypedArray
+			let that = this;
+			
+			if(this.length != other.length){
+				if(this.length == 1){
+					if(this.nm == other.nm)
+						return other.map((a,i)=>Object.operations[op](that.at(0), a, ...hyper));
+					return new TYPED_ARRAY_FROM_NM[TYPE_BINARY_OP[this.nm][other.nm]](other.length).map((a,i)=>Object.operations[op](that.at(0), other.at(i), ...hyper));
+				}
+				if(other.length == 1){
+					if(this.nm == other.nm)
+						return this.map((a,i)=>Object.operations[op](a, other.at(0), ...hyper));
+					return new TYPED_ARRAY_FROM_NM[TYPE_BINARY_OP[this.nm][other.nm]](this.length).map((a,i)=>Object.operations[op](that.at(i), other.at(0), ...hyper));
+				}
+				throw new SizeMismatchError(this.length - other.length);
+			}
+			if(this.nm == other.nm)
+				return this.map((a,i)=>Object.operations[op](a, other.at(i), ...hyper));
+			else{
+				return new TYPED_ARRAY_FROM_NM[TYPE_BINARY_OP[this.nm][other.nm]](this.length).map((a,i)=>Object.operations[op](that.at(i), other.at(i), ...hyper));
+			}
+		}else if(other.isGeneralArray()){ // TypedArray op Array -> Array op Array
+			return this.toArray()[op](other);
+		}else if(typeof other != 'object'){
+			return this.map((a)=>Object.operations[op](a, other, ...hyper));
+		}
+		throw new TypeError();
+	};
+	
+	Type.prototype.sum = Type.prototype.add;
+	Type.prototype.mean = function(){return this.sum() / this.length;};
+	Type.prototype.var = function(){
+		let mean = this.mean();
+		return this.reduce((a,b)=>a + (b-mean)*(b-mean),0).div(this.length);
+	};
+	Type.prototype.stdev = function(){
+		let mean = this.mean();
+		return this.reduce((a,b)=>a + (b-mean)*(b-mean),0).div(this.length).sqrt();
+	};
+	Type.prototype.sumprod = function(other){
+		let A = new Float64Array(this); // 오버플로 방지
+		let B = other === undefined ? A : new Float64Array(other);
+		return A.mul(B).sum();
+	};
+	Type.prototype.N = function(){
+		return this.length;
+	};
+	Type.prototype.max = Type.prototype.greatest;
+	Type.prototype.min = Type.prototype.least;
+	
+	Type.prototype.toStringEx = function(){
+		return this.constructor.name.slice(0,-5)+'['+this+']';
+	};
+	
+	// 형변환 (기본 절삭, 반올림 선택 가능)
+	Array.prototype['to'+Type.name] = function(){return Type.from(this);};
+	if(Type.isIntArray)
+		Array.prototype['roundTo'+Type.name] = function(){return Type.from(this.round());};
+	Type.prototype.toArray = function(){
+		return Array.from(this);
+	};
+	for(let Dest of TypedArrays){
+		Type.prototype['to'+Dest.name] = function(){return Dest.from(this);};
+		if(Dest.isIntArray)
+			Type.prototype['roundTo'+Dest.name] = function(){return Dest.from(this.round());};
+	}
+	
+	Type.prototype.copy = function(){
+		return new Type(this);
+	};
+	
+	Type.prototype.reverseCopy = function(){
+		return this.copy().reverse();
+	};
+	
+	Type.prototype.paste = function(other){ // 내 배열로 붙여넣기
+		//this.length = other.length;
+		if(this.length != other.length) throw new SizeMismatchError(`크기 불일치: ${this.length}:${other.length}`);
+		for(let i of this.length){
+			this[i] = other[i]; // 숫자만 저장되기에 별도로 복사할 필요가 없다
+		}
+		return this;
+	};
+	Type.prototype.pasteTo = function(other){ // 다른 배열에게 내 배열을 붙여넣기
+		return other.paste(this);
+	};
+
+	
+	// 누적, 역시 Float64Array 규정에 따름
+	Type.prototype.accum = function(operator, isRight){
+		let cum = this[isRight ? this.length-1 : 0];
+		if(isRight)
+			return this.reverseCopy().map((a,i,A)=>(cum = i ? Object.operations[operator](cum,a) : cum)).reverse();
+		return this.map((a,i,A)=>(cum = i ? Object.operations[operator](cum,a) : cum));
+	};
+	
+	// 실제 값 접근, 일반 TypedArray는 기존 적용
+	let handler = {
+		get: function(target, i){
+			return target.at(i);
+		},
+		set: function(target, i, v){
+			return target.setAt(i,v);
+		},
+	};
+	
+	// TypedArray의 경우는 덮어쓰기 방식을 사용함
+	// 끝의 값을 정해야 하며 틀리면 RangeError 발생
+	
+	
+	Type.prototype.mid = function(a,b,reversed){
+		return new TypedArrayPointer(this, a, b, reversed);
+	};
+
+	Type.prototype.left = function(a, reversed){
+		return new TypedArrayPointer(this, 0, a, reversed);
+	};
+
+	Type.prototype.right = function(a, reversed){
+		return new TypedArrayPointer(this, this.length-a, this.length, reversed)
+	};
+
+	Type.prototype.__defineGetter__('all', function(){
+		return new TypedArrayPointer(this, 0, this.length, false);
+	});
+
+	Type.prototype.__defineGetter__('rev', function(){
+		return new TypedArrayPointer(this, 0, this.length, true);
+	});
+
+
+	
+	/*
+	Type.prototype.mid = function(a,b){
+		return new TypedArrayPointer(this, a, b);
+	};
+	
+	Type.prototype.left = function(a){
+		return new TypedArrayPointer(this, 0, a);
+	};
+	
+	Type.prototype.right = function(a){
+		return new TypedArrayPointer(this, this.length-a, this.length);
+	};
+	
+	Type.prototype.__defineGetter__('all', function(){
+		return new TypedArrayPointer(this, 0, this.length);
+	});
+	*/
+	
+	
+	Type.prototype.__defineGetter__('value', function(){
+		return this;
+	});
+
+	Type.prototype.__defineSetter__('value', function(arr){
+		if(arr.isArray())
+			this.paste(arr);
+		else
+			this.fill(arr);
+	});
+
+	
+	Type.prototype.__defineGetter__('MIN_VALUE', function(){
+		return Type.RAW_MIN_VALUE;
+	});
+	
+	Type.prototype.__defineGetter__('MAX_VALUE', function(){
+		return Type.RAW_MAX_VALUE;
+	});
+	
+	Type.prototype.__defineGetter__('EPSILON', function(){
+		return Type.RAW_EPSILON;
+	});
+	
+	
+	Type.prototype.setAt = function(idx, value){
+		return this[idx] = value;
+	};
+	
+	for(let op in Gfunc){
+		Type.prototype[op] = Array.prototype[op];
+	}
+	
+};
+
+// 8비트 배열에서는 256개이므로 사용 가능한 모든 숫자 표시, num, den, bias를 줄 수도 있음
+
+Uint8Array.availableValues = function(num,den,bias){
+	let array = new Uint8Array(256);
+	array.forEach((x,i,A)=>A[i] = i);
+	if(num !== undefined)
+		array.setScale(num,den??1,bias??0);
+	return array;
+};
+
+Int8Array.availableValues = function(num,den,bias){
+	let array = new Int8Array(256);
+	array.forEach((x,i,A)=>A[i] = i-128);
+	if(num !== undefined)
+		array.setScale(num,den??1,bias??0);
+	return array;
+};
+
+
+/*
+
+<< 기본 정수형 조절 타입 >>
+
+Scaled8/16/32Array
+- num : 해당 배열에서 곱해질 수
+- den : 해당 배열에서 나눠질 수 (부동소수점 오차 방지)
+- bias: 해당 배열에서 더해질 수 (뺄 수는 '-' 로 저장)
+- 위의 값은 각각 기본적으로 1, 1, 0을 저장함
+- 모든 산술 연산(A.add(B) 등)을 할 경우, 불필요한 환산과 정보의 손실을 막기 위해서 Float64Array로 강제로 변환
+
+- new Scaled8Array({num:10}, 10) : 배율의 10인 값 10개를 준비
+- new Scaled8Array({den:10}, 10) : 배율의 1/10(0.1)인 값 10개를 준비
+- new Scaled8Array({bias:10}, 10): 10을 기준으로 하는 값 10개를 준비
+- 위 생성자는 모두 실제론 0을 저장함으로써, 연산 시 bias(기준)값으로 채워졌다고 보면 됨
+
+- new Scaled8Array({den:10}, [7.882, Math.PI, Math.E]) : 배율이 1/10이므로 소수 둘째자리에서 반올림하여 7.9,3.1,2.7 (실제론 79,31,27) 이 저장됨
+
+- 전역함수 makeBestScaledArray 를 통해서 저장할 최솟값 및 최댓값 범위 배율을 지정할 경우 해당 배열 추천, 초과할 시 Float64Array
+- makeBestScaledArray({min:300, max:400, den:2},[314.2,376.7]).toStringEx(); // Scaled8[314,376.5]
+- makeBestScaledArray({min:300, max:400, den:10},[314.2,376.7]).toStringEx(); // Scaled16[314.2,376.7]
+- 지정된 배열이며, 배열 길이가 1 이상인 상태에서 min, max를 지정하지 않을 경우, 해당 배열의 최소/최댓값을 사용
+- 그렇지 않을 경우, -10000 ~ 10000 을 기본으로 적용함
+- 분자(num), 분모(den) 모두 미지정시 기본 1/100으로 처리
+
+- [중요] 배열 접근 방법은 일반적인 방식으로 하면 환산 전의 원래 값으로 적용됨
+- 따라서, 다음과 같은 접근 방법 사용
+- a.val[i]         : 단일 값 접근
+- a.left(N).value  : 첫 N개 값 접근
+- a.right(N).value : 뒤 N개 값 접근
+- a.mid(M,N).value : M부터 N까지 구간 값 접근
+- a.all.value      : 전체 접근
+- 해당 값을 읽을 시 환산, 쓸 경우엔 역환산 적용 후 반올림 적용
+- 호환을 위해 Array, TypedArray 모두 해당 연산 사용 가능
+
+- 스케일 미 지정시 기본값
+- Scaled8Array     : 1/10
+- Scaled16Array    : 1/100
+- Scaled24Array    : 1/1000
+- Scaled32Array    : 1/10000
+- BigScaled64Array : 1/100000000n
+
+
+*/
+
+
+
+class _Scaled8Array extends Int8Array{
+	static DEFAULT_DEN = 10;
+	constructor(scaleInfo, array_or_size){
+		if(array_or_size === undefined){
+			if((scaleInfo.num ?? scaleInfo.den ?? scaleInfo.bias) === undefined)
+				array_or_size = scaleInfo, scaleInfo = {};
+			else array_or_size = 0;
+		}
+		let num, den;
+		if(scaleInfo.num === undefined && scaleInfo.den === undefined){
+			num = 1; den = 10;
+		}else{
+			num = scaleInfo.num ?? 1;
+			den = scaleInfo.den ?? 1;
+		}
+		let bias = scaleInfo.bias ?? 0;
+		
+		if(isNaN(num)) num = 1;
+		if(isNaN(den)) den = 1;
+		
+		if(den < 1){
+			num *= 1/den;
+			den = 1;
+		};
+		if(isNaN(bias)) bias = 0;
+		
+		// 데이터에 넣기 위해서 변환함, 역함수 사용
+		if(array_or_size !== undefined && array_or_size.isArray()){
+			super(array_or_size.unmdar(num,den,bias));
+		}else{ // 숫자를 넣게 된다면 배열 크기임
+			super(array_or_size);
+		}
+		
+		// 나머지 파라미터 저장
+		this.num  = num;
+		this.den  = den;
+		this.bias = bias;
+		// 분수와 분모는 무조건 1 이상이어야 함
+		
+	};
+	matchToScaleInfo(other){
+		this.num = other.num ?? 1;
+		this.den = other.den ?? 1;
+		this.bias = other.bias ?? 0;
+		return this.proxy ?? this;
+	};
+	static from(scaleInfo, iterable){
+		if(iterable === undefined){
+			if((scaleInfo.num ?? scaleInfo.den ?? scaleInfo.bias) === undefined)
+				iterable = scaleInfo, scaleInfo = {};
+			else iterable = 0;
+		}
+		let num, den;
+		if(scaleInfo.num === undefined && scaleInfo.den === undefined){
+			num = 1; den = 10;
+		}else{
+			num = scaleInfo.num ?? 1;
+			den = scaleInfo.den ?? 1;
+		}
+		let bias = scaleInfo.bias ?? 0;
+		
+		if(isNaN(num)) num = 1;
+		if(isNaN(den)) den = 1;
+		
+		if(den < 1){
+			num *= 1/den;
+			den = 1;
+		};
+		if(isNaN(bias)) bias = 0;
+		
+		// 데이터에 넣기 위해서 변환함, 역함수 사용
+		let array = super.from(iterable.$unmdar(num,den,bias));
+		
+		// 나머지 파라미터 저장
+		array.num  = num;
+		array.den  = den;
+		array.bias = bias;
+		// 분수와 분모는 무조건 1 이상이어야 함
+		
+		return array;
+	};
+	at(idx){
+		return Object.operations.mda(super.at(idx),this.num,this.den,this.bias);
+	};
+	setAt(idx,value){
+		return super[idx] = Object.operations.unmdar(value,this.num,this.den,this.bias);
+	};
+	rawAt(idx){
+		return super.at(idx);
+	};
+	rawSetAt(idx,value){
+		return super[idx] = value;
+	};
+	
+	
+	map(fn){ // 매핑 연산은 무조건 64비트 실수 형으로 반환
+		return this.toFloat64Array().map(fn);
+	};
+	reduce(fn, init){
+		if(init === undefined)
+			return super.reduce((a,b,i,A) => i > 1 ? fn(a,b.mda(this.num,this.den,this.bias),i,A) : fn(a.mda(this.num,this.den,this.bias),b.mda(this.num,this.den,this.bias),i,A));
+		return super.reduce((a,b,i,A) => fn(a,b.mda(this.num,this.den,this.bias),i,A), init);
+	};
+	reduceRight(fn, init){
+		if(init === undefined)
+			return super.reduceRight((a,b,i,A) => i < A.length-2 ? fn(a,b.mda(this.num,this.den,this.bias),i,A) : fn(a.mda(this.num,this.den,this.bias),b.mda(this.num,this.den,this.bias),i,A));
+		return super.reduceRight((a,b,i,A) => fn(a,b.mda(this.num,this.den,this.bias),i,A), init);
+	};
+	forEach(fn){
+		return super.forEach((a,i,A) => fn(a.mda(this.num,this.den,this.bias),i,A));
+	};
+	slice(...args){
+		return super.slice(...args).matchToScaleInfo(this);
+	};
+	subarray(...args){
+		return super.subarray(...args).matchToScaleInfo(this);
+	};
+	fill(...args){
+		args[0] = args[0].unmdar(this.num, this.den, this.bias);
+		return super.fill(...args);
+	};
+	set(...args){
+		args[0] = args[0].unmdar(this.num, this.den, this.bias);
+		return super.set(...args);
+	};
+	copy(){
+		return new Scaled8Array({num:this.num, den:this.den, bias:this.bias}, this);
+	};
+	toArray(){
+		let array = new Array(this.length);
+		this.forEach((a,i,A)=>array[i] = a);
+		return array;
+	};
+	toString(){
+		return this.precise().join(',');
+	};
+	get MIN_VALUE(){
+		return super.MIN_VALUE.mda(this.num, this.den, this.bias);
+	};
+	get MAX_VALUE(){
+		return super.MAX_VALUE.mda(this.num, this.den, this.bias);
+	};
+	get EPSILON(){
+		return this.num / this.den;
+	};
+	static fromHexSequenceBE(scaleInfo, str){
+		const NPE = this.BYTES_PER_ELEMENT * 2; // Nibble
+		let arr = new Scaled8Array(str.length.div(NPE).ceil()).matchToScaleInfo(scaleInfo);
+		
+		arr.length.for(function(i){
+			arr.rawSetAt(i,parseInt(str.slice(i*NPE, (i+1)*NPE).padEnd(NPE,0),16)); // 원 데이터이므로 무조건 원 데이터로 접근해야 함
+		});
+		return arr;
+	};
+	[Symbol.iterator](){
+		let that = this;
+		let i = -1;
+		return{
+			next: () => ({value:that.at(++i), done:!(i<that.length)})
+		};
+	};
+};
+
+
+class Scaled8Array{ // 첨자 기능 포함
+	static DEFAULT_DEN = 10;
+	static handler = {
+		get: (object, key) => {
+			if(typeof key !== 'symbol' && !Number.isNaN(Number(key))){
+				return object.at(key);
+			}
+			const ret = Reflect.get(object, key);
+			return typeof ret === 'function' ? ret.bind(object) : ret;
+		},
+		set: (object, key, value) => {
+			if(typeof key !== 'symbol' && !Number.isNaN(Number(key))){
+				object.setAt(key, value);
+				return true;
+			}
+			Reflect.set(object, key, value);
+			return true;
+		},
+		has: (object, key) => {
+			if(typeof key !== 'symbol' && !Number.isNaN(Number(key))){
+				return true;
+			}
+			return Reflect.has(object, key);
+		},
+	};
+	constructor(...args){
+		return this.proxy = new Proxy(new _Scaled8Array(...args), Scaled8Array.handler);
+	};
+	static from(...args){
+		return this.proxy = new Proxy(_Scaled8Array.from(...args), Scaled8Array.handler);
+	};
+	static fromHexSequenceBE(...args){
+		return this.proxy = new Proxy(_Scaled8Array.fromHexSequenceBE(...args), Scaled8Array.handler);
+	};
+};
+
+
+
+class _Scaled16Array extends Int16Array{
+	static DEFAULT_DEN = 100;
+	constructor(scaleInfo, array_or_size){
+		if(array_or_size === undefined){
+			if((scaleInfo.num ?? scaleInfo.den ?? scaleInfo.bias) === undefined)
+				array_or_size = scaleInfo, scaleInfo = {};
+			else array_or_size = 0;
+		}
+		let num, den;
+		if(scaleInfo.num === undefined && scaleInfo.den === undefined){
+			num = 1; den = 100;
+		}else{
+			num = scaleInfo.num ?? 1;
+			den = scaleInfo.den ?? 1;
+		}
+		let bias = scaleInfo.bias ?? 0;
+		
+		if(isNaN(num)) num = 1;
+		if(isNaN(den)) den = 1;
+		
+		if(den < 1){
+			num *= 1/den;
+			den = 1;
+		};
+		if(isNaN(bias)) bias = 0;
+		
+		// 데이터에 넣기 위해서 변환함, 역함수 사용
+		if(array_or_size !== undefined && array_or_size.isArray()){
+			super(array_or_size.unmdar(num,den,bias));
+		}else{ // 숫자를 넣게 된다면 배열 크기임
+			super(array_or_size);
+		}
+		
+		// 나머지 파라미터 저장
+		this.num  = num;
+		this.den  = den;
+		this.bias = bias;
+		// 분수와 분모는 무조건 1 이상이어야 함
+		
+	};
+	matchToScaleInfo(other){
+		this.num = other.num ?? 1;
+		this.den = other.den ?? 1;
+		this.bias = other.bias ?? 0;
+		return this;
+	};
+	static from(scaleInfo, iterable){
+		if(iterable === undefined){
+			if((scaleInfo.num ?? scaleInfo.den ?? scaleInfo.bias) === undefined)
+				iterable = scaleInfo, scaleInfo = {};
+			else iterable = 0;
+		}
+		let num, den;
+		if(scaleInfo.num === undefined && scaleInfo.den === undefined){
+			num = 1; den = 100;
+		}else{
+			num = scaleInfo.num ?? 1;
+			den = scaleInfo.den ?? 1;
+		}
+		let bias = scaleInfo.bias ?? 0;
+		
+		if(isNaN(num)) num = 1;
+		if(isNaN(den)) den = 1;
+		
+		if(den < 1){
+			num *= 1/den;
+			den = 1;
+		};
+		if(isNaN(bias)) bias = 0;
+		
+		// 데이터에 넣기 위해서 변환함, 역함수 사용
+		let array = super.from(iterable.$unmdar(num,den,bias));
+		
+		// 나머지 파라미터 저장
+		array.num  = num;
+		array.den  = den;
+		array.bias = bias;
+		// 분수와 분모는 무조건 1 이상이어야 함
+		
+		return array;
+	};
+	at(idx){
+		return Object.operations.mda(super.at(idx),this.num,this.den,this.bias);
+	};
+	setAt(idx,value){
+		return super[idx] = Object.operations.unmdar(value,this.num,this.den,this.bias);
+	};
+	rawAt(idx){
+		return super.at(idx);
+	};
+	rawSetAt(idx,value){
+		return super[idx] = value;
+	};
+	
+	map(fn){ // 매핑 연산은 무조건 64비트 실수 형으로 반환
+		return this.toFloat64Array().map(fn);
+	};
+	reduce(fn, init){
+		if(init === undefined)
+			return super.reduce((a,b,i,A) => i > 1 ? fn(a,b.mda(this.num,this.den,this.bias),i,A) : fn(a.mda(this.num,this.den,this.bias),b.mda(this.num,this.den,this.bias),i,A));
+		return super.reduce((a,b,i,A) => fn(a,b.mda(this.num,this.den,this.bias),i,A), init);
+	};
+	reduceRight(fn, init){
+		if(init === undefined)
+			return super.reduceRight((a,b,i,A) => i < A.length-2 ? fn(a,b.mda(this.num,this.den,this.bias),i,A) : fn(a.mda(this.num,this.den,this.bias),b.mda(this.num,this.den,this.bias),i,A));
+		return super.reduceRight((a,b,i,A) => fn(a,b.mda(this.num,this.den,this.bias),i,A), init);
+	};
+	forEach(fn){
+		return super.forEach((a,i,A) => fn(a.mda(this.num,this.den,this.bias),i,A));
+	};
+	slice(...args){
+		return super.slice(...args).matchToScaleInfo(this);
+	};
+	subarray(...args){
+		return super.subarray(...args).matchToScaleInfo(this);
+	};
+	fill(...args){
+		args[0] = args[0].unmdar(this.num, this.den, this.bias);
+		return super.fill(...args);
+	};
+	set(...args){
+		args[0] = args[0].unmdar(this.num, this.den, this.bias);
+		return super.set(...args);
+	};
+	copy(){
+		return new Scaled16Array({num:this.num, den:this.den, bias:this.bias}, this);
+	};
+	toArray(){
+		let array = new Array(this.length);
+		this.forEach((a,i,A)=>array[i] = a);
+		return array;
+	};
+	toString(){
+		return this.precise().join(',');
+	};
+	get MIN_VALUE(){
+		return super.MIN_VALUE.mda(this.num, this.den, this.bias);
+	};
+	get MAX_VALUE(){
+		return super.MAX_VALUE.mda(this.num, this.den, this.bias);
+	};
+	get EPSILON(){
+		return this.num / this.den;
+	};
+	static fromHexSequenceBE(scaleInfo, str){
+		const NPE = this.BYTES_PER_ELEMENT * 2; // Nibble
+		let arr = new Scaled16Array(str.length.div(NPE).ceil()).matchToScaleInfo(scaleInfo);
+		
+		arr.length.for(function(i){
+			arr.rawSetAt(i, parseInt(str.slice(i*NPE, (i+1)*NPE).padEnd(NPE,0),16)); // 원 데이터이므로 무조건 원 데이터로 접근해야 함
+		});
+		return arr;
+	};
+	[Symbol.iterator](){
+		let that = this;
+		let i = -1;
+		return{
+			next: () => ({value:that.at(++i), done:!(i<that.length)})
+		};
+	};
+};
+
+
+class Scaled16Array{ // 첨자 기능 포함
+	static DEFAULT_DEN = 100;
+	static handler = {
+		get: (object, key) => {
+			if(typeof key !== 'symbol' && !Number.isNaN(Number(key))){
+				return object.at(key);
+			}
+			const ret = Reflect.get(object, key);
+			return typeof ret === 'function' ? ret.bind(object) : ret;
+		},
+		set: (object, key, value) => {
+			if(typeof key !== 'symbol' && !Number.isNaN(Number(key))){
+				object.setAt(key, value);
+				return true;
+			}
+			Reflect.set(object, key, value);
+			return true;
+		},
+		has: (object, key) => {
+			if(typeof key !== 'symbol' && !Number.isNaN(Number(key))){
+				return true;
+			}
+			return Reflect.has(object, key);
+		},
+	};
+	constructor(...args){
+		return this.proxy = new Proxy(new _Scaled16Array(...args), Scaled16Array.handler);
+	};
+	static from(...args){
+		return this.proxy = new Proxy(_Scaled16Array.from(...args), Scaled16Array.handler);
+	};
+	static fromHexSequenceBE(...args){
+		return this.proxy = new Proxy(_Scaled16Array.fromHexSequenceBE(...args), Scaled16Array.handler);
+	};
+	
+};
+
+
+
+class _Scaled32Array extends Int32Array{
+	static DEFAULT_DEN = 10000;
+	constructor(scaleInfo, array_or_size){
+		if(array_or_size === undefined){
+			if((scaleInfo.num ?? scaleInfo.den ?? scaleInfo.bias) === undefined)
+				array_or_size = scaleInfo, scaleInfo = {};
+			else array_or_size = 0;
+		}
+		let num, den;
+		if(scaleInfo.num === undefined && scaleInfo.den === undefined){
+			num = 1; den = 10000;
+		}else{
+			num = scaleInfo.num ?? 1;
+			den = scaleInfo.den ?? 1;
+		}
+		let bias = scaleInfo.bias ?? 0;
+		
+		if(isNaN(num)) num = 1;
+		if(isNaN(den)) den = 1;
+		
+		if(den < 1){
+			num *= 1/den;
+			den = 1;
+		};
+		if(isNaN(bias)) bias = 0;
+		
+		// 데이터에 넣기 위해서 변환함, 역함수 사용
+		if(array_or_size !== undefined && array_or_size.isArray()){
+			super(array_or_size.unmdar(num,den,bias));
+		}else{ // 숫자를 넣게 된다면 배열 크기임
+			super(array_or_size);
+		}
+		
+		// 나머지 파라미터 저장
+		this.num  = num;
+		this.den  = den;
+		this.bias = bias;
+		// 분수와 분모는 무조건 1 이상이어야 함
+		
+	};
+	matchToScaleInfo(other){
+		this.num = other.num ?? 1;
+		this.den = other.den ?? 1;
+		this.bias = other.bias ?? 0;
+		return this;
+	};
+	static from(scaleInfo, iterable){
+		if(iterable === undefined){
+			if((scaleInfo.num ?? scaleInfo.den ?? scaleInfo.bias) === undefined)
+				iterable = scaleInfo, scaleInfo = {};
+			else iterable = 0;
+		}
+		let num, den;
+		if(scaleInfo.num === undefined && scaleInfo.den === undefined){
+			num = 1; den = 10000;
+		}else{
+			num = scaleInfo.num ?? 1;
+			den = scaleInfo.den ?? 1;
+		}
+		let bias = scaleInfo.bias ?? 0;
+		
+		if(isNaN(num)) num = 1;
+		if(isNaN(den)) den = 1;
+		
+		if(den < 1){
+			num *= 1/den;
+			den = 1;
+		};
+		if(isNaN(bias)) bias = 0;
+		
+		// 데이터에 넣기 위해서 변환함, 역함수 사용
+		let array = super.from(iterable.$unmdar(num,den,bias));
+		
+		// 나머지 파라미터 저장
+		array.num  = num;
+		array.den  = den;
+		array.bias = bias;
+		// 분수와 분모는 무조건 1 이상이어야 함
+		
+		return array;
+	};
+	at(idx){
+		return Object.operations.mda(super.at(idx),this.num,this.den,this.bias);
+	};
+	setAt(idx,value){
+		return super[idx] = Object.operations.unmdar(value,this.num,this.den,this.bias);
+	};
+	rawAt(idx){
+		return super.at(idx);
+	};
+	rawSetAt(idx,value){
+		return super[idx] = value;
+	};
+	
+	map(fn){ // 매핑 연산은 무조건 64비트 실수 형으로 반환
+		return this.toFloat64Array().map(fn);
+	};
+	reduce(fn, init){
+		if(init === undefined)
+			return super.reduce((a,b,i,A) => i > 1 ? fn(a,b.mda(this.num,this.den,this.bias),i,A) : fn(a.mda(this.num,this.den,this.bias),b.mda(this.num,this.den,this.bias),i,A));
+		return super.reduce((a,b,i,A) => fn(a,b.mda(this.num,this.den,this.bias),i,A), init);
+	};
+	reduceRight(fn, init){
+		if(init === undefined)
+			return super.reduceRight((a,b,i,A) => i < A.length-2 ? fn(a,b.mda(this.num,this.den,this.bias),i,A) : fn(a.mda(this.num,this.den,this.bias),b.mda(this.num,this.den,this.bias),i,A));
+		return super.reduceRight((a,b,i,A) => fn(a,b.mda(this.num,this.den,this.bias),i,A), init);
+	};
+	forEach(fn){
+		return super.forEach((a,i,A) => fn(a.mda(this.num,this.den,this.bias),i,A));
+	};
+	slice(...args){
+		return super.slice(...args).matchToScaleInfo(this);
+	};
+	subarray(...args){
+		return super.subarray(...args).matchToScaleInfo(this);
+	};
+	fill(...args){
+		args[0] = args[0].unmdar(this.num, this.den, this.bias);
+		return super.fill(...args);
+	};
+	set(...args){
+		args[0] = args[0].unmdar(this.num, this.den, this.bias);
+		return super.set(...args);
+	};
+	copy(){
+		return new Scaled32Array({num:this.num, den:this.den, bias:this.bias}, this);
+	};
+	toArray(){
+		let array = new Array(this.length);
+		this.forEach((a,i,A)=>array[i] = a);
+		return array;
+	};
+	toString(){
+		return this.precise().join(',');
+	};
+	get MIN_VALUE(){
+		return super.MIN_VALUE.mda(this.num, this.den, this.bias);
+	};
+	get MAX_VALUE(){
+		return super.MAX_VALUE.mda(this.num, this.den, this.bias);
+	};
+	get EPSILON(){
+		return this.num / this.den;
+	};
+	static fromHexSequenceBE(scaleInfo, str){
+		const NPE = this.BYTES_PER_ELEMENT * 2; // Nibble
+		let arr = new Scaled32Array(str.length.div(NPE).ceil()).matchToScaleInfo(scaleInfo);
+		
+		arr.length.for(function(i){
+			arr.rawSetAt(i, parseInt(str.slice(i*NPE, (i+1)*NPE).padEnd(NPE,0),16)); // 원 데이터이므로 무조건 원 데이터로 접근해야 함
+		});
+		return arr;
+	};
+	[Symbol.iterator](){
+		let that = this;
+		let i = -1;
+		return{
+			next: () => ({value:that.at(++i), done:!(i<that.length)})
+		};
+	};
+};
+
+
+class Scaled32Array{ // 첨자 기능 포함
+	static DEFAULT_DEN = 10000;
+	static handler = {
+		get: (object, key) => {
+			if(typeof key !== 'symbol' && !Number.isNaN(Number(key))){
+				return object.at(key);
+			}
+			const ret = Reflect.get(object, key);
+			return typeof ret === 'function' ? ret.bind(object) : ret;
+		},
+		set: (object, key, value) => {
+			if(typeof key !== 'symbol' && !Number.isNaN(Number(key))){
+				object.setAt(key, value);
+				return true;
+			}
+			Reflect.set(object, key, value);
+			return true;
+		},
+		has: (object, key) => {
+			if(typeof key !== 'symbol' && !Number.isNaN(Number(key))){
+				return true;
+			}
+			return Reflect.has(object, key);
+		},
+	};
+	constructor(...args){
+		return this.proxy = new Proxy(new _Scaled32Array(...args), Scaled32Array.handler);
+	};
+	static from(...args){
+		return this.proxy = new Proxy(_Scaled32Array.from(...args), Scaled32Array.handler);
+	};
+	static fromHexSequenceBE(...args){
+		return this.proxy = new Proxy(_Scaled32Array.fromHexSequenceBE(...args), Scaled32Array.handler);
+	};
+	
+};
+
+
+TYPED_ARRAY_FROM_NM['S8A'] = Scaled8Array;
+TYPED_ARRAY_FROM_NM['S16A'] = Scaled16Array;
+TYPED_ARRAY_FROM_NM['S32A'] = Scaled32Array;
+
+Scaled8Array .nm = Scaled8Array.prototype.nm  = _Scaled8Array .nm = _Scaled8Array.prototype.nm  = 'S8A';
+Scaled16Array.nm = Scaled16Array.prototype.nm = _Scaled16Array.nm = _Scaled16Array.prototype.nm = 'S16A';
+Scaled32Array.nm = Scaled32Array.prototype.nm = _Scaled32Array.nm = _Scaled32Array.prototype.nm = 'S32A';
+
+// ScaledArray <-> TypedArray(Array 포함)
+
+/*
+Array Travel Test
+a = new Uint8Array([125,72,57,33]);
+a.toScaled8Array({num:10})
+ .toScaled8Array({num:7})
+ .toFloat64Array()
+ .toScaled16Array({num:3})
+ .toArray()
+ .toScaled8Array({num:5})
+ .toInt8Array(); // Arrived [-126,70,65,25]
+*/
+
+for(let Type1 of [Scaled8Array, Scaled16Array, Scaled32Array]){
+	for(let Type2 of TypedArrays.concat(Array)){
+		Type1.prototype['to'+Type2.name] = function(){
+			return Type2.from(this);
+		};
+		Type2.prototype['to'+Type1.name] = function(scaleInfo){
+			return Type1.from(scaleInfo ?? {den:Type1.DEFAULT_DEN}, this);
+		};
+		
+	};
+	
+	Type1.numbers = 
+	Type1.makeNumbers = function(scaleInfo, start, n, step){ // start부터 n개의 숫자를 step 간격으로
+		if(step == undefined) step = 1;
+		if(n == undefined) n = start, start = 0;
+		n = Math.floor(n);
+		return new Float64Array(n??0).fill(0).map((x,i)=>(start)+i*(step))['to'+Type1.name](scaleInfo);
+	};
+
+	Type1.linspace = 
+	Type1.makeLinspace = function(scaleInfo, a, b, s){ // a부터 b까지의 숫자를 시작과 끝 포함 s등분함
+		return new Float64Array(s).fill(0).map((x,i)=>a+i*(b-a)/(s-1))['to'+Type1.name](scaleInfo);
+	};
+
+	Type1.randoms = 
+	Type1.makeRandoms = function(scaleInfo, n,k){ // 정수형의 경우는 항상 0으로만 나오기에 미리 곱해줌
+		return new Float64Array(n).fill(0).map(x=>Math.random() * (k??1))['to'+Type1.name](scaleInfo);
+	};
+	
+	
+	// ScaledNArray는 접근 방식이 3가지가 존재함
+	// a[i]      : 환산 없이 저장된 값 그대로 접근
+	// a.val[i]  : 환산 적용하여 접근, 저장 시 역환산 (정수가 아니면 반올림)
+	// a.all.val : 환산 적용한 값들 반환 (AsArray: Array타입으로)
+	//             대입할 경우 각각 대입하여 역환산을 적용함
+	//             숫자를 대입할 경우 전체가 반영됨
+	
+	let handler = {
+		get: function(target, i){
+			return target.at(i);
+		},
+		set: function(target, i, v){
+			i = +i;
+			return target[i < 0 ? i+target.length : i] = v.unmdar(target.num, target.den, target.bias);
+		},
+	};
+	
+	/*
+	Type1.prototype.__defineGetter__('valuesAsArray', function(){
+		return this.toArray();
+	});
+	Type1.prototype.__defineGetter__('values', function(){
+		return this.toFloat64Array();
+	});
+	Type1.prototype.__defineSetter__('values', function(v){
+		v.isArray() ? this.forEach((x,i,A)=>A.val[i] = v.val[i]) : this.forEach((x,i,A)=>A.val[i] = v);
+		return v;
+	});
+	*/
+	
+	
+	
+}
+
+
+const makeBestScaledArray = function(info, array_or_size){ // 15, 25, 2, 1 -> 16 18 20 22 24
+	if(array_or_size === undefined) array_or_size = info, info = {}; // 자동추천
+	let min = info.min ?? (array_or_size.isArray() && array_or_size.length ? array_or_size.min() : -10000);
+	let max = info.max ?? (array_or_size.isArray() && array_or_size.length ? array_or_size.max() : 10000);
+	let num = info.num ?? 1;
+	let den = info.den ?? 1;
+	
+	if(info.digits > 0){
+		num = 1;
+		den = info.digits.pow10();
+	}else if(info.digits <= 0){
+		num = info.digits.minus().pow10();
+		den = 1;
+	}
+	
+	if(info.num === undefined && info.den === undefined && info.digits === undefined) den = 100; // 로직 변경 예정
+	
+	let bias = min.center(max).fractionRound(den);
+	let ubound = ((max - bias) / (num) * (den)).round();
+	
+	if(ubound <= 127) return new Scaled8Array({num:num, den:den, bias:bias}, array_or_size);
+	if(ubound <= 32767) return new Scaled16Array({num:num, den:den, bias:bias}, array_or_size);
+	if(ubound <= 2147483647) return new Scaled32Array({num:num, den:den, bias:bias}, array_or_size);
+	return new Float64Array(array_or_size);
+};
+
+// Set 관련 연산
+// JS의 허술한 관리에 열받아서 작성함. 파이썬은 가능함.
+// 출처: https://medium.com/@ayushksingh/set-in-javascript-3bb903397f2
+
+
+Set.prototype.isSubSet  = function isSubSet(setB){
+/* if the size of current set (say A) is more then the otherSet (say B) A cannot be a subSet of B */
+   if(this.size > setB.size){
+      return false;
+    } else { 
+      for (let el of this){
+        if(!setB.has(el)){
+          return false;
+        } 
+      }
+      return true;
+    }
+};
+Set.prototype.isSuperSet  = function isSuperSet(setB){
+   if(this.size < setB.size){
+      return false;
+    } else { 
+      for (let el of setB){
+        if(!this.has(el)){
+          return false;
+        } 
+      }
+      return true;
+    }
+};
+
+
+
+Set.prototype.union  = function union(setB) {
+    let _union = new Set(this);
+    for (let el of setB) {
+        _union.add(el);
+    }
+    return _union;
+};
+
+Set.prototype.intersection = function intersection(setB) {
+    let _intersection = new Set();
+    for (let el of setB) {
+        if (this.has(el)) {
+            _intersection.add(el);
+        }
+    }
+    return _intersection;
+};
+
+Set.prototype.symmetricDifference = function symmetricDifference( setB) {
+    let _difference = new Set(this);
+    for (let el of setB) {
+        if (_difference.has(el)) {
+            _difference.delete(el);
+        } else {
+            _difference.add(el);
+        }
+    }
+    return _difference;
+};
+
+Set.prototype.setDifference =
+Set.prototype.difference = function difference(setB) {
+    let _difference = new Set(this);
+    for (let el of setB) {
+        _difference.delete(el);
+    }
+    return _difference;
+};
+
+Map.prototype.operation = function(fn, ...args){ // Map의 경우는 연산을 편하게 하기 위해서 다항으로 지원함
+	fn ??= identical;
+	let newMap = new Map();
+	for(let [key, value] of this){
+		if(args.some(x=>x.isMap() && !x.has(key))) throw new KeyMismatchError(`${key}: 불일치`);
+			newMap.set(key, Gfunc.call(value, fn, ...args.map(x=>x.isMap() ? x.get(key) : x)));
+	}
+	if(args.length){ // 교차검증
+		for(let arg of args){
+			if(!arg.isMap()) continue; // Map이 아니면 검증대상 X
+			for(let key of arg.keys()){
+				if(!this.has(key)) throw new KeyMismatchError(`${key}: 불일치`);
+			}
+		}
+	}
+	return newMap;
+};
+
+
+
+
+
+
+
